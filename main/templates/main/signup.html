@@ -1,0 +1,33 @@
+<DOCTYPE HTML5>
+    {% load static %}
+    <html>
+      <head>
+        <link rel="stylesheet" href="{% static 'css/login.css'%}">
+      </head>
+      <body width="100%" height="100%">
+        <form method="post" class="loginForm">
+            {% csrf_token %}
+            <h2>Login</h2>
+            <div class="idForm">
+                <input type="text" name="userid" placeholder="ID" required>
+            </div>
+            <div class="passForm">
+                <input type="password" name="password1" placeholder="PW" required>
+            </div>
+            Confirm Password
+            <div class="passForm">
+                <input type="password" name="password2" placeholder="PW" required>
+            </div>
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="{{message.tags}}">
+                        {{ message.message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <button type=submit class="btn">
+                SIGN UP
+            </button>
+        </form>
+      </body>
+    </html>

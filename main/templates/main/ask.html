@@ -1,0 +1,459 @@
+<!DOCTYPE HTML5>
+    {% load static %}
+    <html>
+      <head>
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'css/chat.css'%}">
+        <meta property="og:url" content="http://www.kwanichani.com">
+        <meta property="og:title" content="spacesheep">
+        <meta property="og:description" content="사용자가 입력한 문구">
+        <meta property="og:image" content="{% static 'images/boorabong.jpg'%}">
+      </head>
+      <body>
+        <div class="chat_window">
+            <div class="top_menu"> 
+                <div class="btn_container" id="toggle">   <!-- 버튼 만들기 위한 큰 틀  버튼 활성화를 위한 토글 -->
+                    <span class="top"></span>         <!-- 햄버거의 맨 위 막대기 -->
+                    <span class="middle"></span>    <!-- 햄버거의 가운데 막대기 -->
+                    <span class="bottom"></span>    <!-- 햄버거의 맨 아래 막대기 -->
+                </div>
+                <div class="fullscreen" id="fullscreen">    <!-- 풀스크린 메뉴 만들기 위한 큰 틀 토글 활성화시 풀스크린 메뉴 열기 -->
+                    <nav class="fullscreen-menu">          <!-- 풀스크린 메뉴 만들기 -->
+                        <ul>
+                            <li><a href="#">menu1</a></li>  <!-- 각 목차 이름 지정 -->
+                            <li><a href="#">menu2</a></li>
+                            <li><a href="#">menu3</a></li>
+                            <li><a href="#">menu4</a></li>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="title">{{owner}}의spacesheep</div>
+            </div>
+            <ul class="messages"></ul>
+            <div class="bottom_wrapper clearfix">
+                <div style="display: none;" class="preview">
+                    <div class="previewdiv"></div>
+                    <button class="delete_photo">
+                        <i class="glyphicon glyphicon-remove" ></i>
+                    </button>
+                </div>
+                <div class="chat-footer">
+                    <textarea class="message_input" maxlength="100" ></textarea>
+                    <label class="upload_photo">
+                        <form hidden>
+                            <input id="myfile" type="file" accept="img/*" hidden/>
+                        </form>
+                        <i class="fa fa-paperclip"></i>
+                    </label>
+                    <button type="button" class="send-message-button btn-info"> <i class="fa fa-send"></i>
+                </div>
+            </div>
+        </div>
+        <div class="message_template">
+            <li class="message">
+                <div class="text_wrapper">
+                    <div class="m_imagediv"></div>
+                    <div class="text"></div>
+                </div>
+                {% if user == room_name %}
+                <button class="m_remove">
+                    <i class="glyphicon glyphicon-remove" ></i>
+                </button>
+                {% endif %}
+            </li>
+        </div>
+      </body>
+    </html>
+
+<script src="http://code.jquery.com/jquery-latest.js"></script> 
+<script src="https://rawgit.com/jackmoore/autosize/master/dist/autosize.min.js"></script> 
+<script src="https://unpkg.com/konva@8.3.0/konva.min.js"></script>
+<script src="https://unpkg.com/gifler@0.1.0/gifler.min.js"></script>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1046.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-base64@3.7.2/base64.min.js"></script>
+
+<script type="text/javascript">
+    var ROOMNAME = "{{room_name|escapejs}}";
+    var OWNER = "{{owner|escapejs}}";
+    var USER = "{{user|escapejs}}";
+    var message_side = 'right';
+    var MAX_WIDTH = 300;
+    var MAX_HEIGHT = 300;
+    
+    var ta = document.querySelector(".message_input");
+    ta.style.display = 'block';
+    autosize(ta);
+
+    console.log(ROOMNAME," starting..")
+    var chatSocket = new WebSocket(
+        'ws://'+ window.location.host + '/home/' + 'ask/' + ROOMNAME 
+    );
+
+    chatSocket.onopen = function(e) {
+        console.log("socket opned!");
+        chatSocket.send(JSON.stringify({
+            'command':'fetch_message',
+            'message': {
+                'room':ROOMNAME,
+            },
+        }));
+    }
+    
+    async function newMessages(messages){
+        for(var message of messages.reverse()){
+            console.log(message);
+            await newMessage(message);
+        }
+        $messages =$('.messages');
+        $('.messages').scrollTop($messages.prop('scrollHeight'));
+    }
+
+    async function newMessage(message){
+        // download image and convert into url
+        var content = message['content']
+        var mid = message['mid']
+        var message_box;
+
+        console.log('new message from' ,content['user'])
+        var message_side = USER == content['user'] ? 'right':'left';
+        var url= null;
+
+        if (content['media']==null) {
+            if (content['text'].trim() === ''){return;}
+        }
+        else{
+            console.log("before process",content['media']);
+            // url = URL.createObjectURL(content['media']);
+            // console.log("after process",url);
+        }
+
+        message_box = new Message({
+            mid: mid,
+            image: content["media"],
+            text: content['text'],
+            message_side: message_side
+        });
+
+        message_box.draw();
+    }
+
+    async function getImagefromS3(url){
+        const res = await fetch(url);
+        console.log("fetch>>>",res);
+        return res; 
+    }
+
+    $("ul.messages").on("click", "button[class='m_share']", function (e) {
+        $this_message = $(this).closest('li.message');
+        var text = $this_message.attr('text');
+    });
+
+    // function decodeURLsafe(url){
+    //     // str_encoded = url + ("=" * (4 - (url.length % 4)));
+    //     str_decoded = decodeURIComponent(escape(atob(url)));
+    //     console.log("str-decoded:",str_decoded);
+    //     return str_decoded;
+    // }
+
+    chatSocket.onmessage = function(e) {
+        console.log("on message time ");
+        var message = JSON.parse(e.data);
+        var command = message['command'];
+        var content = message['message'];
+
+        if (command=="readyto_upload"){
+            var dec_url = content['url']; //decodeURLsafe(content['url']);
+            var fileName = content['fileName'];
+            
+            promise = uploadUsingPresignedURL(url=dec_url,filename=fileName);
+            promise.then((req)=>{
+                console.log("uploadUsingPresignedURL",req);
+                sendMediaMessage(fileName);
+            });
+        }
+        else if (command=="delete_message") {
+            deleteMessage(content);
+        }
+        else{
+            newMessages(content);
+        }
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    function Message(arg) {
+        this.text = arg.text, this.message_side = arg.message_side, this.image=arg.image, this.mid=arg.mid;
+        
+        this.draw = function (_this) {
+            return function () {
+                var $message;
+                var filename = "";
+                $message = $($('.message_template').clone(true).html());
+                $message.addClass(_this.message_side);
+                $message.attr("id",_this.mid);
+                
+                if(_this.text!=null){
+                    $message.find('.text').html( _this.text);
+                    $message.css("font-family","")
+                }
+                
+                if(_this.image!=null){
+                    
+                    let scaledImg = new Image();
+                    let imageLink = document.createElement("a");
+                    
+                    imageLink.setAttribute("href", _this.image);
+                    imageLink.setAttribute('download', `${_this.mid}.webp`);
+
+                    scaledImg.onload = function () {
+                        imageLink.appendChild(scaledImg);
+                        $message.find(".m_imagediv").prepend(imageLink);
+                    };
+                    
+                    scaledImg.setAttribute("src", _this.image);
+                    
+                    $message.prepend(imageLink);
+                    // $message.find(".m_imagediv img").attr('src', _this.image);
+                    
+                    // $message.find(".m_imagediv").prepend(imageLink);
+                }
+                $('.messages').append($message);
+                
+                return setTimeout(function () {
+                    return $message.addClass('appeared');
+                }, 0);
+            };
+        }(this);
+        return this;
+    };
+
+    
+    function readMessageText(){
+        var $message_input;
+        $message_input = $('.message_input');
+        message =  $message_input.val().trim();
+        message = message.replaceAll(/(\n|\r\n)/g, '<br/>');
+        message = removeHTMLTag(message);
+
+        return message;
+    };
+
+    function removeHTMLTag(m){
+        var pattern =/<(\/?)(?!\/|br(?!w))([^<|>]+)?>/g;
+        var substitute = "&lt;$1$2&gt;";
+        return m.replaceAll(pattern,substitute);
+    }
+
+
+    $('.delete_photo').click(async function (e) {
+        $('form').get(0).reset();
+        is_file= false;
+        remove_preview();
+    });
+
+    function deleteMessage(data){
+        // mid == message id
+        var mid = data['mid'];
+        console.log(data['mid']);
+        $(`#${mid}`).remove();
+    }
+
+    $("ul.messages").on("click", "button[class='m_remove']", function (e) {
+        $this_message = $(this).closest('li.message');
+        var mid = $this_message.attr('id');
+        // $this_message.remove();
+        chatSocket.send(JSON.stringify({
+            'command':'delete_message',
+            'message': {
+                'room':ROOMNAME,
+                'mid':mid
+            },
+        }));
+    });
+
+    async function uploadUsingPresignedURL(url,filename){
+        this.file = $('#myfile')[0].files[0];
+        file.name = filename;
+        this.blob = await processFile(file);
+        
+        return await fetch(url,{
+            method:'PUT',
+            body:this.blob
+        })
+    }
+
+    function sendMediaMessage(filename){ 
+        sendChatMessage(filename);
+    }
+
+    function reset_input(){
+        $("form").get(0).reset();
+        ta.value='';
+        autosize.update(ta);
+    }
+
+    function request_presigned_url(filename,method){
+        fname = filename.split('.')[0];
+        chatSocket.send(JSON.stringify({
+            'command':'presigned_url',
+            'message':{
+                'method':method,
+                'media':`${fname}.webp`
+            },
+        }));
+    }
+
+    $('.send-message-button').click(async function (e) {
+        //$(".previewdiv img").attr('src');
+        // var s3_fileName = null;
+        var file =$('#myfile')[0].files[0];
+
+        if (file){
+            var s3_fileName = new Date().getTime()+file.name;
+            // 업로드 요청
+            request_presigned_url(filename=s3_fileName,method='put_object')
+        }
+        else{
+            sendChatMessage();
+        }
+        remove_preview();
+    });
+
+    async function sendChatMessage(mediafile=null){
+        var timestamp = + new Date();
+        var text = readMessageText();
+        
+        var message = {
+            'room': ROOMNAME,
+            'user': USER,
+            'text': text,
+            'media': mediafile,
+            'timestamp': String(timestamp)
+        };
+
+        chatSocket.send(JSON.stringify({
+            'command':'new_message',
+            'message':message,
+        }));
+        
+        reset_input();
+    }
+
+    $('.message_input').keyup(function (e) {
+        // ta.style.display = 'block';
+        autosize.update(ta);
+        if (e.which === 13) {
+            if (!event.shiftKey){
+                $('.send-message-button').click();
+            }
+        }
+    });
+    
+    function remove_preview(){
+        $(".previewdiv img").remove();
+        $(".preview").css("display","none");
+    }
+
+    var is_file = false;
+
+    $('#myfile').on('change',function(e){
+        var fileReader = new FileReader();
+        if (is_file){
+            remove_preview();
+            is_file=false;
+        }
+        is_file=true;
+        var f = e.target.files[0];
+        
+        $(".preview").show();
+        $(".previewdiv").append("<img />");
+        
+        fileReader.onload = function(e) {
+            $(".previewdiv img").attr('src', e.target.result);
+            // if (f.type=='image/gif'){
+            //     $(".previewdiv img").attr('src', e.target.result);
+            // }
+            // else{
+            //     var canvas = document.createElement("canvas");
+            //     var context = canvas.getContext("2d");
+            //     var image = new Image();
+
+            //     image.onload = function() {
+            //         var width = image.width;
+            //         var height = image.height;
+
+            //         if (width > height) {
+            //             if (width > MAX_WIDTH) {
+            //                 height *= MAX_WIDTH / width;
+            //                 width = MAX_WIDTH;
+            //             }
+            //         } else {
+            //             if (height > MAX_HEIGHT) {
+            //                 width *= MAX_HEIGHT / height;
+            //                 height = MAX_HEIGHT;
+            //             }
+            //         }
+            //         canvas.width = width;
+            //         canvas.height = height;
+                    
+            //         context.drawImage(image, 0, 0, width, height);
+            //         newurl = canvas.toDataURL();
+            //         $(".previewdiv img").attr('src', newurl);
+            //     };
+            //     image.src = e.target.result;
+            // }
+        };
+        fileReader.readAsDataURL(f);
+    });
+    
+    $('#toggle').click(function() {
+        $(this).toggleClass('active');
+        $('#fullscreen').toggleClass('open');
+    });
+
+    async function processFile(file) {
+
+        return new Promise(function(resolve,reject){
+            // Load the data into an image
+            let rawImage = new Image();
+            this.webpurl =null;
+            // convert raw Image into webp format && resizing 
+            let canvas = document.createElement('canvas');
+            let ctx = canvas.getContext("2d");
+
+            rawImage.onload = function () {
+                if (rawImage.src){
+                    var width = rawImage.width;
+                    var height = rawImage.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    ctx.drawImage(rawImage, 0, 0, width, height);
+                    canvas.toBlob(function(blob){
+                        console.log("this webpurl",this.webpurl);
+                        resolve(blob);
+                    },"image/webp");
+                }
+            };
+
+            rawImage.src = URL.createObjectURL(file);
+            rawImage.crossOrigin = 'Anonymous';
+            
+        })
+    }
+</script>

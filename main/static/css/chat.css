@@ -1,0 +1,405 @@
+* {
+  box-sizing: border-box;
+}
+@font-face {
+  font-family: 'KyoboHand';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/KyoboHand.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+body {
+  background-color: #edeff2;
+  font-family:'KyoboHand',"Calibri", "Roboto", sans-serif;
+}
+
+.chat_window {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 20px);
+  max-width: 100%;
+  height: calc(100% - 40px);
+  border-radius: 10px;
+  background-color: #fff;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  background-color: #f8f8f8;
+  overflow: hidden;
+}
+
+.top_menu {
+  background-color: #deb887;
+  width: 100%;
+  padding: 20px 0 15px;
+  box-shadow: 0 1px 30px rgba(0, 0, 0, 0.1);
+}
+
+.top_menu .title {
+  text-align: center;
+  color: #fff8dc;
+  font-size: 20px;
+}
+
+.messages {
+  /* position: absolute; */
+  position: relative;
+  list-style: none;
+  padding: 20px 10px 0 10px;
+  margin: 0;
+  /* height: calc(100% - 150px); */
+  background-color: #fff8dc;
+  flex:1;
+  overflow: scroll;
+  -ms-overflow-style: none;
+}
+::-webkit-scrollbar { display: none; }
+
+.messages .message {
+  position: relative;
+  clear: both;
+  overflow: hidden;
+  margin-bottom: 10px;
+  transition: all 0.5s linear;
+  opacity: 1;
+}
+
+.messages .message.left .text_wrapper {
+  background-color:white;
+  border-radius: 0 15px 15px 15px;
+  margin: 0px 0px;
+  display: inline-block;
+}
+.messages .message.left .text_wrapper::after, .messages .message.left .text_wrapper::before {
+  right: 100%;
+  border-right-color: #ffe6cb;
+}
+.messages .message.right .text_wrapper::after, .messages .message.left .text_wrapper::before {
+  left: 100%;
+  border-right-color: #ffe6cb;
+}
+.messages .message .text {
+  color: black;
+}
+.messages .message.left button{
+  background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+  width: 12;
+  position: relative;
+  margin: 5px 0px;
+  padding-left: 0px;
+  border: medium none;
+  display:inline-block;
+}
+.messages .message.right button{
+  background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
+  width: 12;
+  position: relative;
+  margin: 15px 1px;
+  padding-left: 0px;
+  vertical-align: middle;
+  border: medium none;
+  float:right;
+}
+.messages .message button i{
+  font-size: 10px;
+  color: #f5886e;
+}
+.messages .message.right .text_wrapper {
+  background-color: white;
+  vertical-align: middle;
+  border-radius: 15px 0px 15px 15px;
+  margin-right: 7px;
+  /* display: inline-block; */
+  float:right;
+}
+
+/* .messages .message.appeared {
+  opacity: 1;
+} */
+
+.messages .message .text_wrapper {
+  display: inline-block;
+  padding: 7px;
+  max-width: 200px;
+  min-width: 10px;
+  position: relative;
+}
+.messages .message .text_wrapper::after, .messages .message .text_wrapper:before {
+  top: 18px;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.messages .message .text_wrapper .text {
+  display: inline-block;
+  font-size: 17px;
+  font-weight: 300;
+  word-break: break-all;
+}
+
+.messages .message .text_wrapper .m_imagediv img{
+  padding: 0px;
+  border-radius: 6px;
+  max-width: 100%;
+  height: auto;
+}
+
+.bottom_wrapper {
+  align-items: center;
+  width: 100%;
+  /* height: 110px; */
+  background-color: #fff8dc;
+  margin: 0 auto 0 auto;
+  position: relative;
+  display: inline-block;
+  margin: 0 0;
+}
+
+
+.bottom_wrapper .preview {
+  width: 100%;
+  /* height: 300px; */
+  display: inline-block;
+  background-color: #ffffff;
+  padding: 10px 10px;
+} 
+
+.previewdiv img{
+  width: 250px;
+  height: auto;
+  align-items: center;
+  float: left;
+}
+.bottom_wrapper .delete_photo{
+  float:right;
+  align-items: center;
+}
+
+.message_template {
+  display: none;
+}
+
+.chat-footer {
+  position: relative;
+  width: 100%;
+  padding: 10px 40px;
+}
+
+.chat-footer .message_input {
+  position: relative;
+  display: block;
+  resize: none;
+  width: 100%;
+  overflow: hidden;
+  font-size: large;
+  border-radius:10px;
+  overflow-wrap: break-word;
+  outline-style:solid;
+  outline-color: #ffe6cb;
+  outline-width: 1px;
+  border: 1px solid #fff8dc;
+  padding: 10px 55px 10px 15px;
+}
+
+.chat-footer .send-message-button {
+  display: block;
+  position: absolute;
+  width: 35px;
+  height: 35px;
+  right: 100px;
+  top: 0;
+  bottom: 0;
+  background-color: #f5886e;
+  margin: auto;
+  border: 1px solid rgba(0,0,0,0.05);
+  outline: none;
+  font-weight: 600;
+  border-radius: 50%;
+  padding: 0;
+}
+
+.chat-footer .send-message-button > i {
+  font-size: 16px;
+  margin: 0 0 0 -2px;
+  color: white;
+}
+
+.chat-footer label.upload_photo > input[type="file"] {
+  position: fixed;
+  top: -1000px;
+}
+
+.chat-footer .upload_photo {
+  display: block;
+  position: absolute;
+  right: 150px;
+  height: 30px;
+  font-size: 25px;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  opacity: 0.25;
+}
+
+.chat-footer .upload_photo:hover {
+  opacity: 1;
+}
+
+@media screen and (max-width: 767px) {
+  .chat-footer {
+    margin-bottom: 10px;
+    padding: 15px 15px;
+  }
+  .chat-footer .send-message-button {
+    right: 35px;
+  }
+
+  .chat-footer .upload_photo {
+    right: 85px;
+  }
+}
+
+.btn_container {
+  position: fixed;
+  top: 25px;
+  right: 4%;
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
+  transition: opacity .25s ease;
+}
+.btn_container:hover {
+  opacity: .7;
+}
+  
+.btn_container.active .top {
+  transform: translateY(8px) translateX(0) rotate(45deg);
+}
+
+.btn_container.active .middle {
+  opacity: 0;
+}
+    
+.btn_container.active .bottom {
+  transform: translateY(-8px) translateX(0) rotate(-45deg);
+}
+
+.btn_container span {
+  background:#fff8dc;
+  height: 3px;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  border-radius: 50px;
+  left: 0;
+  transition:  all .35s ease;
+  cursor: pointer;
+}
+.btn_container span:nth-of-type(2) {
+  top: 8px;
+}
+    
+.btn_container span:nth-of-type(3) {
+  top: 16px;
+}
+
+
+/* 메뉴버튼 활성화시 보여질 풀스크린(빨간 배경) 메뉴 만들기 */
+.fullscreen {
+  position: fixed;
+  background: #a3d063;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .35s, visibility .35s, height .35s;
+  overflow: hidden;
+}
+.fullscreen .open {
+    opacity: .9;
+    visibility: visible;
+    height: 100%;
+}
+.fullscreen .open li {
+  animation: fadeInRight .5s ease forwards;
+  animation-delay: .35s;
+} 
+.fullscreen .open li :nth-of-type(2) {
+  animation-delay: .4s;
+}
+.fullscreen .open li :nth-of-type(3) {
+  animation-delay: .45s;
+}
+.fullscreen .open li :nth-of-type(4) {
+  animation-delay: .50s;
+}
+
+
+/* 풀스크린 메뉴 - 메뉴 */
+.fullscreen nav {
+    position: relative;
+    height: 70%;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 50px;
+    font-family: 'Vollkorn', serif;
+    font-weight: 400;
+    text-align: center;
+}
+.fullscreen ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    display: inline-block;
+    position: relative;
+    height: 100%; 
+}
+.fullscreen li {
+      display: block;
+      height: 25%;
+      height: calc(100% / 4);
+      min-height: 50px;
+      position: relative;
+      opacity: 0;
+}
+.fullscreen li a {
+  display: block;
+  position: relative;
+  color: white;
+  text-decoration: none;
+  overflow: hidden;
+}
+.fullscreen li:hover:after,.fullscreen li:focus:after,.fullscreen li:active:after {
+  width: 100%;
+}
+        
+.fullscreen li:hover:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0%;
+  transform: translateX(-50%);
+  height: 3px;
+  background: #a3d063;
+  transition: .35s;
+}
+
+/* 키프레임으로 메뉴들이 나타날때 효과를 줌 */
+@keyframes fadeInRight {
+  0% {
+    opacity: 0;
+    left: 20%;
+  }
+  100% {
+    opacity: 1;
+    left: 0;
+  }
+}
