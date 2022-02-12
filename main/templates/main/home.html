@@ -9,21 +9,18 @@
     <body width="100%" height="100%">
     
         <div class="container">
+            <div class="tempimg">
             <img src= "{% static 'images/임시.png' %}">
-            
-            <div class="loginForm">
-                    <li class="btn">
-                        <a href="/../logout">
-                        <button type=submit class="btn">
-                            LOG OUT
-                        </button>
-                    </li>
-                    <li class="btn">
-                        <a href="ask/{{room_name}}">
-                        <button type=submit class="btn">
-                            ASK
-                        </button>
-                    </li>
+            </div>
+            <div class="menu">
+                <a href="/../logout">
+                <button classtype=submit class="btn">
+                    LOG OUT
+                </button>
+                <a href="ask/{{room_name}}">
+                <button type=submit class="btn">
+                    ASK
+                </button>
             </div>
             <!-- END MENU -->
                 

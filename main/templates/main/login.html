@@ -2,9 +2,120 @@
     {% load static %}
     <html>
       <head>
+        <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
         <link rel="stylesheet" href="{% static 'css/login.css'%}">
       </head>
-      <body width="100%" height="100%">
+      <div class="container">
+    	<div class="row">
+			<div class="myform">
+				<div class="panel panel-login">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-xs-6">
+								<a href="#" class="active" id="login-form-link">Login</a>
+							</div>
+							<div class="col-xs-6">
+								<a href='../signup' id="register-form-link">Register</a>
+							</div>
+						</div>
+						<hr>
+					</div>
+					<div class="panel-body">
+						<div class="row">
+							<div class="col-lg-12">
+                                
+								<form id="login-form" method="post" role="form" style="display: block;">
+									{% csrf_token %}
+                                    <div class="form-group">
+										<input type="email" name="userid" id="email" tabindex="1" class="form-control" placeholder="Email Address" value="">
+									</div>
+                                    {% csrf_token %}
+									<div class="form-group">
+										<input type="password" name="userpw" id="password" tabindex="2" class="form-control" placeholder="Password">
+									</div>
+                                    
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            <div class="{{message.tags}}">
+                                                {{ message.message }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                    {% csrf_token %}
+									<div class="form-group">
+										<div class="row">
+											<div class="submit-button">
+												<input type="submit" value="Log In">
+											</div>
+                                            {% load socialaccount %}
+                                            {% providers_media_js %}
+                                            <!-- <div class="submit-button">
+												<input type="submit" name="트위터로 계속하기" id="login-submit" tabindex="4" class="form-control btn btn-login" value="트위터로 계속하기">
+											</div>
+                                            <div class="submit-button">
+												<input type="submit" name="구글로 계속하기" id="login-submit" tabindex="4" class="form-control btn btn-login" value="구글로 계속하기">
+											</div> -->
+										</div>
+									</div>
+								</form>
+                                {% csrf_token %}
+								<form id="register-form" action="../signup/" method="post" role="form" style="display: none;">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+										<input type="email" name="userid" id="email" tabindex="1" class="form-control" placeholder="Email Address" value="">
+									</div>
+                                    {% csrf_token %}
+									<div class="form-group">
+										<input type="password" name="password1" id="password" tabindex="2" class="form-control" placeholder="Password">
+									</div>
+                                    {% csrf_token %}
+									<div class="form-group">
+										<input type="password" name="password2" id="confirm-password" tabindex="2" class="form-control" placeholder="Confirm Password">
+									</div>
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            <div class="{{message.tags}}">
+                                                {{ message.message }}
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+									<div class="form-group">
+										<div class="row">
+											<div class="submit-button">
+                                                <input type="submit" action="../signup" value="Register Now">
+											</div>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+    <script type="text/javascript">
+    $(function() {
+
+        $('#login-form-link').click(function(e) {
+            $("#login-form").delay(100).fadeIn(100);
+             $("#register-form").fadeOut(100);
+            $('#register-form-link').removeClass('active');
+            $(this).addClass('active');
+            e.preventDefault();
+        });
+        $('#register-form-link').click(function(e) {
+            $("#register-form").delay(100).fadeIn(100);
+             $("#login-form").fadeOut(100);
+            $('#login-form-link').removeClass('active');
+            $(this).addClass('active');
+            e.preventDefault();
+        });
+    
+    });
+</script>
+
+      <!-- <body width="100%" height="100%">
         <form method="post" class="loginForm">
             {% csrf_token %}
             <h2>Login</h2>
@@ -27,23 +138,10 @@
             <button type=submit class="btn">
                 LOG IN
             </button>
-        </form>
-        {% load socialaccount %}
-        {% providers_media_js %}
-        <div class="flex flex-col w-full">
-            <!-- receiving from django-allauth -->    
-            <a href="{% provider_login_url "twitter" %}" class="btn">
-                <i class="fab fa-twitter mr-2"></i> 트위터로 계속하기
-            </a>
-        </div>
-        <div class="flex flex-col w-full">
-            <!-- receiving from django-allauth -->    
-            <a href="{% provider_login_url "google" %}" class="btn">
-                <i class="fab fa-google mr-2"></i> 구글로 계속하기
-            </a>
-        </div>
+        </form> -->
+<!--         
         <div class="bottomText">
             Don't you have ID? <a style="text-decoration: none;" href="../signup/">sign up</a>
         </div>
       </body>
-    </html>
+    </html> -->

@@ -6,15 +6,15 @@ import boto3
 from django.http import Http404   
 import base64
 
-def delete_DBmessage(mid):
-    [owner, timestamp] = mid.split('_')
+def delete_DBmessage(data):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('chat-message')
+    mid = data['mid'].split('_')
     try:
         response = table.delete_item(
             Key={
-                'owner':owner,
-                'timestamp':timestamp
+                'owner':mid[0],
+                'timestamp':mid[1],
             },
         )
         return response
@@ -44,6 +44,7 @@ async def get_latest_messages(room,ExclusiveStartKey):
                 ScanIndexForward=False,
                 ConsistentRead=True,
             )
+            # print(response['Items'])
         return response['Items']
 
     except ClientError as e:

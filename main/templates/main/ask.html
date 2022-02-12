@@ -106,7 +106,7 @@
             await newMessage(message);
         }
         $messages =$('.messages');
-        $('.messages').scrollTop($messages.prop('scrollHeight'));
+        $messages.animate({scrollTop: $messages.prop('scrollHeight')*2});
     }
 
     async function newMessage(message){
@@ -114,18 +114,13 @@
         var content = message['content']
         var mid = message['mid']
         var message_box;
-
-        console.log('new message from' ,content['user'])
+        
+        console.log('new message from' ,content);
         var message_side = USER == content['user'] ? 'right':'left';
         var url= null;
 
         if (content['media']==null) {
-            if (content['text'].trim() === ''){return;}
-        }
-        else{
-            console.log("before process",content['media']);
-            // url = URL.createObjectURL(content['media']);
-            // console.log("after process",url);
+            if(content['text']===null || content['text'].trim() === ''){return;}
         }
 
         message_box = new Message({
@@ -136,6 +131,8 @@
         });
 
         message_box.draw();
+        // $messages =$('.messages');
+        // $messages.scrollTop($messages.prop('scrollHeight'));
     }
 
     async function getImagefromS3(url){
@@ -163,9 +160,10 @@
         var content = message['message'];
 
         if (command=="readyto_upload"){
-            var dec_url = content['url']; //decodeURLsafe(content['url']);
+
+            var dec_url = content['url'];
             var fileName = content['fileName'];
-            
+
             promise = uploadUsingPresignedURL(url=dec_url,filename=fileName);
             promise.then((req)=>{
                 console.log("uploadUsingPresignedURL",req);

@@ -10,6 +10,7 @@ from botocore.exceptions import ClientError
 from ..dynamodbauth import *
 
 def login(request): 
+    print(request)
     if request.method == 'GET':
         uid = request.session.get('user')
 
@@ -28,7 +29,6 @@ def login(request):
 
         if uinfo:
             CacheUser(email=email,room=uinfo['room'],name=uinfo['name']).cacheUser()
-            
             next_url = request.POST.get('next') or "home" 
             # enc = parse.quote(self.user.getCachedRoom().encode('utf-8'))
             return redirect(next_url)
@@ -54,16 +54,17 @@ def signup(request):
             response = createUser(request,email,pass1)
             
             if response:
+                print(response)
                 # korean -> unicode -> url format
                 next_url = request.GET.get('next') or "home"
                 return redirect(next_url)
         else:
             messages.error(request, '비밀번호가 일치하지 않습니다.')
         
-        return render(request,'main/signup.html')
+        return redirect('login')
 
     if request.method == 'GET':
-        return render(request, 'main/signup.html')
+        return redirect('login')
 
 # def create_bucket(bucket_name,region=None):
 #     try:

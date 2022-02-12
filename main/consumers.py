@@ -5,6 +5,7 @@ from datetime import datetime
 from django.conf import settings
 from .cache import *
 from .dynamodbchat import *
+from .batch_writeDB import batch_write
 import time, json
 import base64, random
 import requests 
@@ -17,7 +18,8 @@ class AskConsumer(AsyncWebsocketConsumer):
     async def new_message(self,data):
         print("new message!!")
         # mid 생성
-        mid = '_'.join([self.room_name,str(data['timestamp'])])
+        mid = '_'.join([self.room_name,data['timestamp']])
+        print(mid)
         url = None
         # message caching 
         if data['media'] is not None:
@@ -48,9 +50,8 @@ class AskConsumer(AsyncWebsocketConsumer):
         )
 
     async def delete_message(self,data):
+        response = delete_DBmessage(data)
         mid = data['mid']
-        response = delete_DBmessage(mid)
-        print(response)
         if response['ResponseMetadata']['HTTPStatusCode']==200:
             CacheMessage(mid).deleteMessage()
             content = {
@@ -82,12 +83,13 @@ class AskConsumer(AsyncWebsocketConsumer):
         
         latest_mid = await getCachedLatestKey(self.room_name)
         
-        res = await get_cached_data(room=self.room_name, latest_mid=latest_mid)
-        print("cached data", res)
+        messages = await get_cached_data(room=self.room_name, latest_mid=latest_mid)
+        
         await self.send(text_data=json.dumps({
             "command":"fetch_message",
-            "message": res['messages'],
+            "message": messages,
         }))
+        # await batch_write()
 
     commands = {
         'fetch_message':fetch_message,
