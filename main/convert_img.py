@@ -16,5 +16,5 @@ def convert_jpg():
         item_name = item_name_without_tag.split("/")[-1]
         im = Image.open(item).convert("RGB")
         webp_name = photo_files_dest + item_name + ".webp"
-        print(webp_name)
+        # print(webp_name)
         im.save(webp_name, "webp")

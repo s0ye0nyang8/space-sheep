@@ -16,10 +16,10 @@ class AskConsumer(AsyncWebsocketConsumer):
     blocklist = []
 
     async def new_message(self,data):
-        print("new message!!")
+        # print("new message!!")
         # mid 생성
         mid = '_'.join([self.room_name,data['timestamp']])
-        print(mid)
+        # print(mid)
         url = None
         # message caching 
         if data['media'] is not None:
@@ -79,7 +79,7 @@ class AskConsumer(AsyncWebsocketConsumer):
             }))
 
     async def fetch_message(self,data):
-        print("fetch..")
+        # print("fetch..")
         
         latest_mid = await getCachedLatestKey(self.room_name)
         
@@ -99,22 +99,22 @@ class AskConsumer(AsyncWebsocketConsumer):
     }
 
     async def connect(self):
-        print("connecting...")
+        # print("connecting...")
         self.room_name = self.scope["url_route"]['kwargs']["room_name"]
         self.room_group_name = 'chat_%s' % self.room_name
-        print(self.room_group_name)
+        # print(self.room_group_name)
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
     async def disconnect(self,close_code):
-        print("disconnecting...")
+        # print("disconnecting...")
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
     
     # Receive message from WebSocket
     async def receive(self, text_data): 
         data = json.loads(text_data)
-        print("recieved from socket :", data['command'])
+        # print("recieved from socket :", data['command'])
         await self.commands[data['command']](self,data['message'])
         
 

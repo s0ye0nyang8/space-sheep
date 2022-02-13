@@ -54,7 +54,6 @@ def signup(request):
             response = createUser(request,email,pass1)
             
             if response:
-                print(response)
                 # korean -> unicode -> url format
                 next_url = request.GET.get('next') or "home"
                 return redirect(next_url)

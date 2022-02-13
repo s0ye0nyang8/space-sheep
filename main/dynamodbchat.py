@@ -24,7 +24,7 @@ def delete_DBmessage(data):
 
 
 async def get_latest_messages(room,ExclusiveStartKey):
-    print("get_latest_messages..")
+    # print("get_latest_messages..")
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('chat-message')
     # option = ExclusiveStartKey=ExclusiveStartKey
@@ -56,7 +56,7 @@ async def get_presigned_url(method,filename):
     if url is not None:
         return url
     else:
-        print("fail to get url")
+        # print("fail to get url")
         return None
 
 async def create_presigned_post(method, bucket_name, object_name):

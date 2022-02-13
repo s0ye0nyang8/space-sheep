@@ -14,7 +14,6 @@ def home(request):
         user = CacheUser(user_id)
         room = user.getCachedRoom()
         owner = user.getCachedName()
-        print(room,owner)
         if room is None:
             try:
                 del request.session['user']

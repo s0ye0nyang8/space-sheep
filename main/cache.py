@@ -118,7 +118,7 @@ async def caching_DBdata(room):
     # 데이터 db에서 가져와서 캐싱을 하고, 그중 가장 최신값의 mid 를 반환
     # startkey= request.session.get('startkey')
     items = await get_latest_messages(room=room,ExclusiveStartKey=None)
-    print("caching db data..")
+    # print("caching db data..")
     if items != []:
         # request.session.set('startkey', res['LastEvaluatedKey'])
         prev = None
@@ -137,7 +137,7 @@ async def caching_DBdata(room):
 
 async def get_cached_data(room,resource=None,latest_mid=None):
     messages = []
-    print("getting cached data..",room, latest_mid)
+    # print("getting cached data..",room, latest_mid)
     
     if latest_mid is None:
         _mid = await getCachedLatestKey(room)

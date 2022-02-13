@@ -39,7 +39,7 @@ def myauthenticate(request,email,password):
         response = table.get_item(
             Key={'email': email}
         )
-        print(response)
+        # print(response)
         if 'Item' in response.keys():
             encoded_pass = hashlib.sha256(str(password).encode('utf-8')).hexdigest()
             if encoded_pass == response['Item']['password']:
