@@ -3,27 +3,25 @@
     {% load static %}
     <head>
         <meta charset="UTF-8" />
-        <link rel="stylesheet" href="{% static 'css/login.css'%}">
-        <title>Document</title>
+        <link rel="stylesheet" href="{% static 'css/home.css'%}">
+        <title>main home</title>
     </head>
     <body width="100%" height="100%">
-    
-        <div class="container">
-            <div class="tempimg">
-            <img src= "{% static 'images/임시.png' %}">
-            </div>
-            <div class="menu">
-                <a href="/../logout">
-                <button classtype=submit class="btn">
-                    LOG OUT
-                </button>
+        <div class="bg-image">
+            <div class="home-menu">
                 <a href="ask/{{room_name}}">
-                <button type=submit class="btn">
-                    ASK
-                </button>
-            </div>
-            <!-- END MENU -->
-                
+                    <div class="gradient-text">
+                        RIDE A SPACE-SHEEP
+                    </div>
+                </a>
+                <div class="home-btn" onclick="location.href='/../logout'">
+                    프로필 꾸미기🐏
+                </div>
+                <div class="home-btn" onclick="location.href='/../logout'">
+                    로그아웃🐏
+                </div>
+            </div>           
         </div>
+        
     </body>
 </html>

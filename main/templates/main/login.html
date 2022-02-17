@@ -2,146 +2,110 @@
     {% load static %}
     <html>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
         <link rel="stylesheet" href="{% static 'css/login.css'%}">
       </head>
-      <div class="container">
-    	<div class="row">
-			<div class="myform">
-				<div class="panel panel-login">
-					<div class="panel-heading">
-						<div class="row">
-							<div class="col-xs-6">
-								<a href="#" class="active" id="login-form-link">Login</a>
-							</div>
-							<div class="col-xs-6">
-								<a href='../signup' id="register-form-link">Register</a>
-							</div>
-						</div>
-						<hr>
-					</div>
-					<div class="panel-body">
-						<div class="row">
-							<div class="col-lg-12">
-                                
-								<form id="login-form" method="post" role="form" style="display: block;">
-									{% csrf_token %}
-                                    <div class="form-group">
-										<input type="email" name="userid" id="email" tabindex="1" class="form-control" placeholder="Email Address" value="">
-									</div>
-                                    {% csrf_token %}
-									<div class="form-group">
-										<input type="password" name="userpw" id="password" tabindex="2" class="form-control" placeholder="Password">
-									</div>
-                                    
-                                    {% if messages %}
-                                        {% for message in messages %}
-                                            <div class="{{message.tags}}">
-                                                {{ message.message }}
-                                            </div>
-                                        {% endfor %}
-                                    {% endif %}
-                                    {% csrf_token %}
-									<div class="form-group">
-										<div class="row">
-											<div class="submit-button">
-												<input type="submit" value="Log In">
-											</div>
-                                            {% load socialaccount %}
-                                            {% providers_media_js %}
-                                            <!-- <div class="submit-button">
-												<input type="submit" name="트위터로 계속하기" id="login-submit" tabindex="4" class="form-control btn btn-login" value="트위터로 계속하기">
-											</div>
-                                            <div class="submit-button">
-												<input type="submit" name="구글로 계속하기" id="login-submit" tabindex="4" class="form-control btn btn-login" value="구글로 계속하기">
-											</div> -->
-										</div>
-									</div>
-								</form>
-                                {% csrf_token %}
-								<form id="register-form" action="../signup/" method="post" role="form" style="display: none;">
-                                    {% csrf_token %}
-                                    <div class="form-group">
-										<input type="email" name="userid" id="email" tabindex="1" class="form-control" placeholder="Email Address" value="">
-									</div>
-                                    {% csrf_token %}
-									<div class="form-group">
-										<input type="password" name="password1" id="password" tabindex="2" class="form-control" placeholder="Password">
-									</div>
-                                    {% csrf_token %}
-									<div class="form-group">
-										<input type="password" name="password2" id="confirm-password" tabindex="2" class="form-control" placeholder="Confirm Password">
-									</div>
-                                    {% if messages %}
-                                        {% for message in messages %}
-                                            <div class="{{message.tags}}">
-                                                {{ message.message }}
-                                            </div>
-                                        {% endfor %}
-                                    {% endif %}
-									<div class="form-group">
-										<div class="row">
-											<div class="submit-button">
-                                                <input type="submit" action="../signup" value="Register Now">
-											</div>
-										</div>
-									</div>
-								</form>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-    <script type="text/javascript">
-    $(function() {
-
-        $('#login-form-link').click(function(e) {
-            $("#login-form").delay(100).fadeIn(100);
-             $("#register-form").fadeOut(100);
-            $('#register-form-link').removeClass('active');
-            $(this).addClass('active');
-            e.preventDefault();
-        });
-        $('#register-form-link').click(function(e) {
-            $("#register-form").delay(100).fadeIn(100);
-             $("#login-form").fadeOut(100);
-            $('#login-form-link').removeClass('active');
-            $(this).addClass('active');
-            e.preventDefault();
-        });
-    
-    });
-</script>
-
-      <!-- <body width="100%" height="100%">
-        <form method="post" class="loginForm">
-            {% csrf_token %}
-            <h2>Login</h2>
-            <div class="idForm">
-                <input type="text" name="userid" placeholder="ID" required>
+      <body>
+            <div class="logo-image">
+                <img class="col-0 spaceship" src="{% static 'images/spaceship.png'%}">
             </div>
-            <div class="passForm">
-                <input type="password" name="userpw" placeholder="PW" required>
-            </div>
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="{{message.tags}}">
-                        {{ message.message }}
+            <div class="panel-heading">
+                <div class="col-1">
+                    <div class="login">
+                        <a href="#" class="active" id="login-form-link">로그인</a>
                     </div>
-                {% endfor %}
-            {% endif %}
-            {% if request.GET.next %}
-                <input type="hidden" name="next" value="{{request.GET.next}}">
-            {% endif %}
-            <button type=submit class="btn">
-                LOG IN
-            </button>
-        </form> -->
-<!--         
-        <div class="bottomText">
-            Don't you have ID? <a style="text-decoration: none;" href="../signup/">sign up</a>
-        </div>
-      </body>
-    </html> -->
+                    <div class="register">
+                        <a href='../signup' id="register-form-link">처음 오셨나요?</a>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <form id="login-form" method="post" role="form" style="display: block;">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input class="col-1" type="email" name="userid" id="email" tabindex="1"  placeholder="Email Address" value="">
+                        </div>    
+                        <div class="form-group">
+                            {% csrf_token %}
+                            <input class="col-1" type="password" name="userpw" id="password" tabindex="2"  placeholder="Password">
+                        </div>
+                        <div class="form-group">
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="col-1 {{message.tags}}">
+                                    {{ message.message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        </div>
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <div class="col-1 submit-button">
+                                <input type="submit" id="login-submit" tabindex="4" class="btn btn-login" value="확인">
+                            </div>
+                        <!-- {% load socialaccount %}
+                        {% providers_media_js %}
+                            <div class="submit-button">
+                                <input type="submit" class="btn btn-twitter" value="트위터로 계속하기">
+                            </div>
+                            <div class="submit-button">
+                                <input type="submit" name="구글로 계속하기" id="login-submit" tabindex="4" class="btn btn-google" value="구글로 계속하기">
+                            </div> -->
+                        </div>
+                    </form>
+                    <form id="register-form" action="../signup/" method="post" role="form" style="display: none;">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input class="col-1" type="email" name="userid" id="email" tabindex="1"  placeholder="Email Address" value="">
+                        </div>
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input class="col-1" name="password1" id="password" tabindex="2" placeholder="Password">
+                        </div>
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input class="col-1" type="password" name="password2" id="confirm-password" tabindex="2" placeholder="Confirm Password">
+                        </div>
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="col-1 {{message.tags}}">
+                                    {{ message.message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="form-group">
+                            <div class="col-1 submit-button">
+                                <input type="submit" action="../signup" id="login-submit" tabindex="4" class="btn btn-register" value="계정 생성하기">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- <div class="footer">
+                <img class="col-3" src="{% static 'images/footer.png'%}">
+            </div> -->
+       </body>
+	</html>
+
+<script type="text/javascript">
+$(function() {
+
+    $('#login-form-link').click(function(e) {
+        $("#login-form").delay(100).fadeIn(100);
+            $("#register-form").fadeOut(100);
+        $('#register-form-link').removeClass('active');
+        $(this).addClass('active');
+        e.preventDefault();
+    });
+    $('#register-form-link').click(function(e) {
+        $("#register-form").delay(100).fadeIn(100);
+            $("#login-form").fadeOut(100);
+        $('#login-form-link').removeClass('active');
+        $(this).addClass('active');
+        e.preventDefault();
+    });
+
+});
+</script>

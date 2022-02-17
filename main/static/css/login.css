@@ -1,155 +1,138 @@
+@font-face {
+  font-family: 'KyoboHand';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@1.0/KyoboHand.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
-  padding-top: 90px;
   font-family:'KyoboHand',"Calibri", "Roboto", sans-serif;
 }
 
-.container{
-  /* background-color: #edeff2; */
-  position: absolute;
-  width: 1000px;
-  height: auto;
-  left: 50%;
-  top: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  text-align: center;
-}
-
-.container .tempimg img{
-  width: 50%;
-  height: auto;
-}
-
-.myform{
-  width: 50%;
-  transform: translateX(50%) translateY(30%);
-}
-.submit-button{
-  width: 100%;
-  text-align: center;
-  background-color: #fff8dc;
-  color: #f5886e;
-}
-.menu .btn {
-  display: block;
-  /* position: absolute; */
-  width: 50%;
-  height: 50px;
-  right: 100px;
-  /* background-color: #f5886e; */
+.col-0, .col-1, .col-3{
   margin: auto;
-  border: 1px solid rgba(0,0,0,0.05);
-  outline: none;
-  font-weight: 600;
-  border-radius: 0;
-  padding: 10;
+  text-align: center;
+}
+.col-0 {width: 30%;}
+.col-1 {width: 50%;}
+.col-3 {width: 40%;}
+
+
+@media only screen and (max-width: 500px) {
+  /* For mobile phones: */
+  .col-1, .col-3 {
+    width: 100%;
+  }
+  .col-0{
+    width: 70%;
+  }
 }
 
 
-.form-control{
-  background-color: white;
+.form-group{
+  margin: auto;
+  text-align: center;
+}  
+.logo-image{
+  margin: auto;
+  text-align: center;
+}
+.container .panel-heading {
+  background-color: none;
+}
+  
+.panel-heading a{
+  text-decoration: none;
+  color: grey;
+  font-weight:normal;
+  font-size: 20px;
 }
 
-.panel-login {
-border-color: white;
+.panel-heading .login,.panel-heading .register{
+  margin: auto;
+  text-align: center;
 }
-.panel-login>.panel-heading {
-color: #f5886e;
-background-color: #fff;
-border-color: #fff;
-text-align:center;
-}
-.panel-login>.panel-heading a{
-text-decoration: none;
-color: #f5886e;
+
+
+.panel-heading a.active{
+color: black;
 font-weight: bold;
-font-size: 15px;
-/* -webkit-transition: all 0.1s linear;
--moz-transition: all 0.1s linear;
-transition: all 0.1s linear; */
+font-size: 35px;
 }
-.panel-login>.panel-heading a.active{
-color: #f5886e;
-font-size: 18px;
+
+.container .panel-body{
+  margin-top: 50px;
 }
-.panel-login>.panel-heading hr{
-margin-top: 10px;
-margin-bottom: 0px;
-clear: both;
-border: 0;
-height: 1px;
-/* background-image: -webkit-linear-gradient(left,rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.15),rgba(0, 0, 0, 0));
-background-image: -moz-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.15),rgba(0,0,0,0));
-background-image: -ms-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.15),rgba(0,0,0,0));
-background-image: -o-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.15),rgba(0,0,0,0)); */
-}
-.panel-login input[type="text"],.panel-login input[type="email"],.panel-login input[type="password"] {
-  position: relative;
-  display: block;
-  resize: none;
+
+.btn {
+  color: black;
   width: 100%;
+  background-color: #fff8dc;
+  font-size: 20px;
+  display: block;
+  border: 1px;
+  outline: none;
+  border-radius: 15px;
+  padding: 10;
+  margin-bottom: 5;
+}
+
+.form-group input{
+  font-family:'KyoboHand',"Calibri", "Roboto", sans-serif;
+  position: relative;
+  font-size: 20px;
   overflow: hidden;
-  font-size: large;
-  border-radius:10px;
+  margin: auto;
+  text-align: left;
+  /* font-size: large; */
   overflow-wrap: break-word;
   outline-style:solid;
   outline-color: #ffe6cb;
   outline-width: 1px;
   border: 1px solid #fff8dc;
-  padding: 10px 55px 10px 15px;
+  padding: 10px 15px 10px 15px;
 }
-  /* height: 45px;
-border: 1px solid #edeff2;
-font-size: 16px;
--webkit-transition: all 0.1s linear;
--moz-transition: all 0.1s linear;
-transition: all 0.1s linear; */
-/* } */
-/* .panel-login input:hover,
-.panel-login input:focus {
-outline:none;
--webkit-box-shadow: none;
--moz-box-shadow: none;
-box-shadow: none;
-border-color: #edeff2;
-} */
-.btn-login {
-/* background-color: #edeff2; */
-outline: none;
-color: #f5886e;
-font-size: 14px;
-height: auto;
-font-weight: normal;
-padding: 14px 0;
-text-transform: uppercase;
-border-color: #f5886e;
-}
-.form-group{
-  color: white;
-}
-/* .forgot-password {
-text-decoration: underline;
-color: #888;
-}
-.forgot-password:hover,
-.forgot-password:focus {
-text-decoration: underline;
-color: #666;
-} */
 
-.btn-register {
-background-color: #f5886e;
-outline: none;
-color: #fff;
-font-size: 14px;
-height: auto;
-font-weight: normal;
-padding: 14px 0;
-text-transform: uppercase;
-border-color: #f5886e;
+.form-group input[type="email"]{
+  margin-top: 50;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
-.btn-register:hover,
-.btn-register:focus {
-color: #fff;
-background-color:#ffe6cb;
-border-color: #f5886e;
+
+.form-group input[type="password"] {
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+.form-group input[type="submit"]{
+  text-align: center;
+  margin-top: 20;
+}
+.form-group input:hover,
+.form-group input:focus {
+  outline-width: 3px;
+}
+
+.menu .home-btn:hover,
+.menu .home-btn:focus {
+  color:black;
+  font-size: larger;
+}
+
+.menu .home-btn{
+  margin-top: auto;
+  font-family : 'KyoboHand',"Calibri", "Roboto", sans-serif;
+  position: relative;
+  font-size: 60px;
+  background-color: white;
+  font-size: 20px;
+  height: 50px;
+  border: none;
+}
+
+.footer {
+  position: fixed; 
+  bottom: 0; 
+  width: 100%;
+  margin: auto;
+  text-align: center;
 }
