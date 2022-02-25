@@ -9,6 +9,16 @@ body {
   font-family:'KyoboHand',"Calibri", "Roboto", sans-serif;
 }
 
+/* .bg-image {
+  background-image: url("../images/space-bg.png");
+  background-color: #cccccc;
+  height:100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+} */
+
 .col-0, .col-1, .col-3{
   margin: auto;
   text-align: center;
@@ -53,6 +63,17 @@ body {
   text-align: center;
 }
 
+.bg-image {
+  width: 100%;
+  margin: auto;
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  height: fit-content;
+}
 
 .panel-heading a.active{
 color: black;
@@ -110,23 +131,6 @@ font-size: 35px;
 .form-group input:hover,
 .form-group input:focus {
   outline-width: 3px;
-}
-
-.menu .home-btn:hover,
-.menu .home-btn:focus {
-  color:black;
-  font-size: larger;
-}
-
-.menu .home-btn{
-  margin-top: auto;
-  font-family : 'KyoboHand',"Calibri", "Roboto", sans-serif;
-  position: relative;
-  font-size: 60px;
-  background-color: white;
-  font-size: 20px;
-  height: 50px;
-  border: none;
 }
 
 .footer {

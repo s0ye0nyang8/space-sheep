@@ -3,7 +3,9 @@
     {% load static %}
     <head>
         <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="{% static 'css/home.css'%}">
+        <meta property="og:image" content="{% static 'images/대문.png'%}">
         <title>main home</title>
     </head>
     <body width="100%" height="100%">
@@ -11,17 +13,46 @@
             <div class="home-menu">
                 <a href="ask/{{room_name}}">
                     <div class="gradient-text">
-                        RIDE A SPACE-SHEEP
+                        {{nickname}}, 안녕하세요!        
+                        <p class="sub">입장하려면 클릭</p>
                     </div>
                 </a>
-                <div class="home-btn" onclick="location.href='/../logout'">
+                <div class="btn_container home-btn" id="toggle">   <!-- 버튼 만들기 위한 큰 틀  버튼 활성화를 위한 토글 -->
                     프로필 꾸미기🐏
+                </div>
+                <div class="overlay" id="overlay">
+                    <nav class="overlay-menu">
+                        <ul>
+                            <li>정보 수정</li>
+                            <form id="update-form" method="post" enctype="multipart/form-data" role="form" style="display: block;">
+                                {% csrf_token %}
+                                <li>    
+                                    <input class="user-info" name="nickname" placeholder="닉네임 설정">
+                                    <!-- <input class="romm-info" type="file" accept="img/*" name="bg-file" placeholder="채팅방 배경">    
+                                    <div class="bg-preview"></div> -->
+                                </li>
+                                <li>
+                                    <input type="submit" value="확인">
+                                </li>
+                            </form>
+                        </ul>
+                    </nav>
                 </div>
                 <div class="home-btn" onclick="location.href='/../logout'">
                     로그아웃🐏
                 </div>
+                <p>Contact</p>
+                <p>yang82soyeon@gmail.com</p>
             </div>           
         </div>
         
     </body>
 </html>
+<script src="http://code.jquery.com/jquery-latest.js"></script> 
+<script>
+        $("#toggle").click(function() {
+        $(this).toggleClass("active");
+        $('#overlay').toggleClass('open');
+        // $(".fullscreen").slideToggle();
+    });
+</script>

@@ -1,7 +1,6 @@
 from botocore.exceptions import ClientError
 from boto3.dynamodb.types import TypeSerializer
 from boto3.dynamodb.conditions import Key
-
 import boto3 
 from django.http import Http404   
 import base64

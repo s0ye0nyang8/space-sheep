@@ -9,8 +9,7 @@ import boto3
 from botocore.exceptions import ClientError
 from ..dynamodbauth import *
 
-def login(request): 
-    print(request)
+def login(request):
     if request.method == 'GET':
         uid = request.session.get('user')
 
@@ -28,7 +27,8 @@ def login(request):
         uinfo = myauthenticate(request, email=email, password=pass1)
 
         if uinfo:
-            CacheUser(email=email,room=uinfo['room'],name=uinfo['name']).cacheUser()
+            CacheUser(email=email,room=uinfo['room'],name=uinfo['uname']).cacheUser()
+            CacheRoom(roomid=uinfo['room']).cacheRoom()
             next_url = request.POST.get('next') or "home" 
             # enc = parse.quote(self.user.getCachedRoom().encode('utf-8'))
             return redirect(next_url)
@@ -50,27 +50,17 @@ def signup(request):
         pass2 = request.POST['password2']
         
         if pass1 == pass2:
-    
-            response = createUser(request,email,pass1)
-            
-            if response:
-                # korean -> unicode -> url format
+            roomid = createUser(request,email,pass1)
+            if roomid:
+                request.session['user']=email
+                CacheUser(email=email,name='아무개',room=roomid).cacheUser()
+                CacheRoom(roomid=roomid).cacheRoom()
                 next_url = request.GET.get('next') or "home"
                 return redirect(next_url)
         else:
-            messages.error(request, '비밀번호가 일치하지 않습니다.')
+            messages.error(request, '입력한 두 비밀번호가 일치하지 않습니다.')
         
         return redirect('login')
 
     if request.method == 'GET':
         return redirect('login')
-
-# def create_bucket(bucket_name,region=None):
-#     try:
-#         s3_client = boto3.client('s3')
-#         location = {'LocationConstraint':region}
-#         s3_client.create_bucket(Bucket=bucket_name,CreateBucketConfiguration=location)
-#     except ClientError as e:
-#         logging.error(e)
-#         return False
-#     return True

@@ -11,12 +11,13 @@ async def batch_write():
     
     tasks = []
     
-    for user in alluser:
-        room = user['userinfo']['room']
-        tasks.append(asyncio.create_task(writetoDB(room)))
-    
-    for task in tasks:
-        await task
+    if alluser:    
+        for user in alluser:
+            room = user['userinfo']['room']
+            tasks.append(asyncio.create_task(writetoDB(room)))
+        
+        for task in tasks:
+            await task
     
 
 async def getAllUser():

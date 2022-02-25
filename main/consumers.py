@@ -89,6 +89,7 @@ class AskConsumer(AsyncWebsocketConsumer):
             "command":"fetch_message",
             "message": messages,
         }))
+
         # await batch_write()
 
     commands = {

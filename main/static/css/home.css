@@ -34,6 +34,7 @@ body {
 .bg-image {
   background-image: url("../images/space-bg.png");
   background-color: #cccccc;
+  /* background-color: white; */
   height:100%;
   background-position: center;
   background-repeat: no-repeat;
@@ -53,7 +54,6 @@ body {
     height: fit-content;
 }
 
-
 .gradient-text{
   background: linear-gradient(to right, crimson,pink,springgreen);
   background-size: 200% 200%;
@@ -61,7 +61,7 @@ body {
   background-clip: text;
   -webkit-background-clip:text;
   color:rgba(0,0,0,0);
-  font-size:40px;
+  font-size:38px;
   width:auto;
   margin:30vh auto;
   display:block;
@@ -77,9 +77,122 @@ body {
 a{
   text-decoration: none;
 }
+.gradient-text .sub{
+  font-size: 18px;
+}
+
 
 @keyframes rainbow { 
   0%{background-position:left}
   50%{background-position:right}
   100%{background-position:left}
+}
+.btn_container {
+  height: fit-content;
+  margin: auto;
+  text-align: center;
+  width: auto;
+  color: white;
+  font-size: 22px;
+  z-index: 100;
+  /* position: fixed;
+  top: 25px;
+  right: 4%;
+  height: 20px;
+  width: 20px; */
+  cursor: pointer;
+  transition: opacity .25s ease;
+}
+.btn_container:hover {
+  opacity: .7;
+}
+
+.overlay {
+  z-index: 80;
+  position: fixed;
+  background: white;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .35s, visibility .35s, height .35s;
+  overflow: hidden;
+}
+.overlay.open {
+  opacity: .9;
+  visibility: visible;
+  height: 100%;
+}
+.overlay.open li {
+  animation: fadeInRight .5s ease forwards;
+  animation-delay: .35s;
+}
+.overlay.open li:nth-of-type(2) {
+  animation-delay: .4s;
+}
+.overlay.open li:nth-of-type(3) {
+  animation-delay: .45s;
+}
+.overlay.open li:nth-of-type(4) {
+  animation-delay: .50s;
+}
+.overlay nav {
+  position: relative;
+  height: 70%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  font-weight: 400;
+  text-align: center;
+}
+.overlay ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  display: inline-block;
+  position: relative;
+  height: 100%;
+}
+.overlay ul li {
+  display: block;
+  width: 100%;
+  height: 25%;
+  height: calc(100% / 4);
+  min-height: 50px;
+  position: relative;
+  opacity: 0;
+}
+.overlay ul li a {
+  display: block;
+  position: relative;
+  color: black;
+  text-decoration: none;
+  overflow: hidden;
+}
+.overlay ul li a:hover:after, .overlay ul li a:focus:after, .overlay ul li a:active:after {
+  width: 100%;
+}
+.overlay ul li a:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0%;
+  transform: translateX(-50%);
+  height: 3px;
+  background: #FFF;
+  transition: .35s;
+}
+
+@keyframes fadeInRight {
+  0% {
+    opacity: 0;
+    left: 20%;
+  }
+  100% {
+    opacity: 1;
+    left: 0;
+  }
 }

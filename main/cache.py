@@ -1,6 +1,6 @@
 from django.core.cache import cache
-# from .dynamodbauth import getUserinfo, updateUserInfo
 from .dynamodbchat import get_latest_messages
+from .dynamodbauth import getRoominfo
 from django.http import Http404  
 
 class CacheUser:
@@ -30,7 +30,7 @@ class CacheUser:
     def getCachedRoom(self):
         return self.room
 
-    def update(self,name=None,desc=None):
+    def cacheUser(self,name=None,desc=None):
         self.name = name or self.name 
         self.desc = desc or self.desc
         userinfo = {
@@ -38,30 +38,8 @@ class CacheUser:
             'room':self.room,
             'desc':self.desc
         }
-        roominfo = {
-            'name':self.name,
-            'desc':self.desc
-        }
-        # updateUserInfo(self.email,userinfo)
-        # updateRoomInfo(self.room,roominfo)
-        self.cacheUser()
-    
-    def cacheUser(self):
-        userinfo = {
-            'name':self.name,
-            'room':self.room,
-            'desc':self.desc
-        }
-        roominfo = {
-            'name':self.name,
-            'desc':self.desc
-        }
         cache.set(self.email,userinfo,timeout=None)
-        cache.set(self.room,roominfo,timeout=None)
         
-def getOwner(room):
-    roominfo = cache.get(room)
-    return roominfo['name']
 
 class CacheMessage:
     def __init__(self, mid, nextkey=None, content=None):
@@ -165,3 +143,32 @@ async def get_cached_data(room,resource=None,latest_mid=None):
 
     return messages
 
+class CacheRoom:
+    def __init__(self, roomid, name=None, bg=None):
+        self.room = roomid
+        self.roomname = name
+        self.bg=bg
+        if self.roomname is None:
+            # roominfo = cache.get(roomid)
+            # if roominfo is not None:
+            #     self.roomname = roominfo['name']
+            #     self.bg = roominfo['bg']
+            # else:
+            roominfo = getRoominfo(roomid)
+            if roominfo is not None:
+                self.roomname = roominfo['rname']
+                self.bg = roominfo['bg']
+
+    def cacheRoom(self):
+        roominfo = {
+            'name':self.roomname,
+            'bg':self.bg
+        }
+        cache.set(self.room,roominfo,timeout=None)
+
+    def getName(self):
+        return self.roomname
+
+    def getBg(self):
+        return self.bg
+        

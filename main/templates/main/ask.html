@@ -5,32 +5,46 @@
         <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'css/chat.css'%}">
-        <meta property="og:url" content="http://www.kwanichani.com">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta property="og:title" content="spacesheep">
-        <meta property="og:description" content="사용자가 입력한 문구">
-        <meta property="og:image" content="{% static 'images/boorabong.jpg'%}">
+        <meta property="og:description" content="초대장 -🐏- ">
+        <meta property="og:image" content="{% static 'images/대문.png'%}">
       </head>
       <body>
         <div class="chat_window">
             <div class="top_menu"> 
-                <div class="btn_container" id="toggle">   <!-- 버튼 만들기 위한 큰 틀  버튼 활성화를 위한 토글 -->
-                    <span class="top"></span>         <!-- 햄버거의 맨 위 막대기 -->
-                    <span class="middle"></span>    <!-- 햄버거의 가운데 막대기 -->
-                    <span class="bottom"></span>    <!-- 햄버거의 맨 아래 막대기 -->
+                <div class="title">
+                    <h1>{{roominfo.name}}</h1>
+                    <div class="menu-btn">
+                        <div class="btn_container" id="toggle">   <!-- 버튼 만들기 위한 큰 틀  버튼 활성화를 위한 토글 -->
+                            <span class="top"></span>         <!-- 햄버거의 맨 위 막대기 -->
+                            <span class="middle"></span>    <!-- 햄버거의 가운데 막대기 -->
+                            <span class="bottom"></span>    <!-- 햄버거의 맨 아래 막대기 -->
+                        </div>
+                        <div class="overlay" id="overlay">
+                            <nav class="overlay-menu">
+                                <ul>
+                                    <li>정보 수정</li>
+                                    <form id="update-form" method="post" enctype="multipart/form-data" role="form" style="display: block;">
+                                        {% csrf_token %}
+                                        <li>    
+                                            <input class="romm-info" name="rname" placeholder="채팅방 이름">
+                                            <!-- <input class="romm-info" type="file" accept="img/*" name="bg-file" placeholder="채팅방 배경">     -->
+                                            <!-- <div class="bg-preview"></div> -->
+                                        </li>
+                                        <li>
+                                            <input type="submit" value="확인">
+                                        </li>
+                                    </form>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
                 </div>
-                <div class="fullscreen" id="fullscreen">    <!-- 풀스크린 메뉴 만들기 위한 큰 틀 토글 활성화시 풀스크린 메뉴 열기 -->
-                    <nav class="fullscreen-menu">          <!-- 풀스크린 메뉴 만들기 -->
-                        <ul>
-                            <li><a href="#">menu1</a></li>  <!-- 각 목차 이름 지정 -->
-                            <li><a href="#">menu2</a></li>
-                            <li><a href="#">menu3</a></li>
-                            <li><a href="#">menu4</a></li>
-                        </ul>
-                    </nav>
-                </div>
-                <div class="title">{{owner}}의spacesheep</div>
             </div>
-            <ul class="messages"></ul>
+            <!-- <div class="msg-area"> -->
+                <ul class="messages"></ul>
+            <!-- </div> -->
             <div class="bottom_wrapper clearfix">
                 <div style="display: none;" class="preview">
                     <div class="previewdiv"></div>
@@ -75,8 +89,8 @@
 
 <script type="text/javascript">
     var ROOMNAME = "{{room_name|escapejs}}";
-    var OWNER = "{{owner|escapejs}}";
     var USER = "{{user|escapejs}}";
+    var ROOMINFO = "{{roominfo|escapejs}}";
     var message_side = 'right';
     var MAX_WIDTH = 300;
     var MAX_HEIGHT = 300;
@@ -85,13 +99,11 @@
     ta.style.display = 'block';
     autosize(ta);
 
-    console.log(ROOMNAME," starting..")
-    var chatSocket = new WebSocket(
-        'ws://'+ window.location.host + '/home/' + 'ask/' + ROOMNAME 
-    );
+    // var chatSocket = new WebSocket(
+    //     'ws://'+ window.location.host + '/home/' + 'ask/' + ROOMNAME 
+    // );
 
     chatSocket.onopen = function(e) {
-        console.log("socket opned!");
         chatSocket.send(JSON.stringify({
             'command':'fetch_message',
             'message': {
@@ -102,7 +114,6 @@
     
     async function newMessages(messages){
         for(var message of messages.reverse()){
-            console.log(message);
             await newMessage(message);
         }
         $messages =$('.messages');
@@ -115,7 +126,6 @@
         var mid = message['mid']
         var message_box;
         
-        console.log('new message from' ,content);
         var message_side = USER == content['user'] ? 'right':'left';
         var url= null;
 
@@ -137,7 +147,6 @@
 
     async function getImagefromS3(url){
         const res = await fetch(url);
-        console.log("fetch>>>",res);
         return res; 
     }
 
@@ -146,15 +155,7 @@
         var text = $this_message.attr('text');
     });
 
-    // function decodeURLsafe(url){
-    //     // str_encoded = url + ("=" * (4 - (url.length % 4)));
-    //     str_decoded = decodeURIComponent(escape(atob(url)));
-    //     console.log("str-decoded:",str_decoded);
-    //     return str_decoded;
-    // }
-
     chatSocket.onmessage = function(e) {
-        console.log("on message time ");
         var message = JSON.parse(e.data);
         var command = message['command'];
         var content = message['message'];
@@ -166,7 +167,6 @@
 
             promise = uploadUsingPresignedURL(url=dec_url,filename=fileName);
             promise.then((req)=>{
-                console.log("uploadUsingPresignedURL",req);
                 sendMediaMessage(fileName);
             });
         }
@@ -255,7 +255,6 @@
     function deleteMessage(data){
         // mid == message id
         var mid = data['mid'];
-        console.log(data['mid']);
         $(`#${mid}`).remove();
     }
 
@@ -274,13 +273,18 @@
 
     async function uploadUsingPresignedURL(url,filename){
         this.file = $('#myfile')[0].files[0];
-        file.name = filename;
-        this.blob = await processFile(file);
         
+        fm = file.name.split('.');
+        if (fm[1]!=='gif'){
+            this.media = await processFile(file);
+        }
+        else{
+            this.media = this.file;
+        }
         return await fetch(url,{
             method:'PUT',
-            body:this.blob
-        })
+            body:this.media
+        });
     }
 
     function sendMediaMessage(filename){ 
@@ -305,13 +309,10 @@
     }
 
     $('.send-message-button').click(async function (e) {
-        //$(".previewdiv img").attr('src');
-        // var s3_fileName = null;
         var file =$('#myfile')[0].files[0];
 
         if (file){
             var s3_fileName = new Date().getTime()+file.name;
-            // 업로드 요청
             request_presigned_url(filename=s3_fileName,method='put_object')
         }
         else{
@@ -341,7 +342,6 @@
     }
 
     $('.message_input').keyup(function (e) {
-        // ta.style.display = 'block';
         autosize.update(ta);
         if (e.which === 13) {
             if (!event.shiftKey){
@@ -371,45 +371,8 @@
         
         fileReader.onload = function(e) {
             $(".previewdiv img").attr('src', e.target.result);
-            // if (f.type=='image/gif'){
-            //     $(".previewdiv img").attr('src', e.target.result);
-            // }
-            // else{
-            //     var canvas = document.createElement("canvas");
-            //     var context = canvas.getContext("2d");
-            //     var image = new Image();
-
-            //     image.onload = function() {
-            //         var width = image.width;
-            //         var height = image.height;
-
-            //         if (width > height) {
-            //             if (width > MAX_WIDTH) {
-            //                 height *= MAX_WIDTH / width;
-            //                 width = MAX_WIDTH;
-            //             }
-            //         } else {
-            //             if (height > MAX_HEIGHT) {
-            //                 width *= MAX_HEIGHT / height;
-            //                 height = MAX_HEIGHT;
-            //             }
-            //         }
-            //         canvas.width = width;
-            //         canvas.height = height;
-                    
-            //         context.drawImage(image, 0, 0, width, height);
-            //         newurl = canvas.toDataURL();
-            //         $(".previewdiv img").attr('src', newurl);
-            //     };
-            //     image.src = e.target.result;
-            // }
         };
         fileReader.readAsDataURL(f);
-    });
-    
-    $('#toggle').click(function() {
-        $(this).toggleClass('active');
-        $('#fullscreen').toggleClass('open');
     });
 
     async function processFile(file) {
@@ -443,7 +406,6 @@
                     
                     ctx.drawImage(rawImage, 0, 0, width, height);
                     canvas.toBlob(function(blob){
-                        console.log("this webpurl",this.webpurl);
                         resolve(blob);
                     },"image/webp");
                 }
@@ -454,4 +416,10 @@
             
         })
     }
+
+    $("#toggle").click(function() {
+        $(this).toggleClass("active");
+        $('#overlay').toggleClass('open');
+        // $(".fullscreen").slideToggle();
+    });
 </script>

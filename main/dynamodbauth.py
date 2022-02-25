@@ -1,5 +1,4 @@
 from botocore.exceptions import ClientError
-from .cache import CacheUser
 from django.contrib import messages
 from django.http import Http404 
 import hashlib
@@ -7,30 +6,35 @@ import uuid
 import boto3
 
 
-def updateUserInfo(request,email,userinfo):
-    CacheUser(email).update(userinfo.name,userinfo.desc)
+def updateUserInfo(request,email,name,desc):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('user')
     try:
         response = table.update_item(
             Key={'email': email},
-            UpdateExpression="set name=:n, set description=:d" ,
-            ExpressionAttributeValues= {':n': userinfo.name, ':d': userinfo.desc}
+            UpdateExpression="SET userinfo.uname=:n, userinfo.description=:d" ,
+            ExpressionAttributeValues= {':n': name, ':d': desc}
         )
-        response = table.update_item(
-            Key={'room': room},
-            UpdateExpression="set name=:n, set description=:d" ,
-            ExpressionAttributeValues= {':n': userinfo.name, ':d': userinfo.desc}
-        )
-
-        CacheUser(email).update(userinfo.name,userinfo.desc)
-
         return response
     except ClientError as e:
-        raise Http404("User does not exist")
+        print(e)
+        # raise Http404("User does not exist")
 
+def updateRoomInfo(request,roomid,name,bg):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('room')
+    try:
+        response = table.update_item(
+            Key={'roomid': roomid},
+            UpdateExpression="SET roominfo.rname=:n" ,
+            ExpressionAttributeValues= {':n': name}
+        )
+        return response
 
+    except ClientError as e:
+        print(e)
 
+        # raise Http404("Room does not exist")
 
 def myauthenticate(request,email,password):
     try:
@@ -46,7 +50,6 @@ def myauthenticate(request,email,password):
                 # set cache and session 
                 request.session['user']=email
                 return response['Item']['userinfo']
-                
 
         messages.add_message(request,messages.ERROR,"id or password not correct")
         return None
@@ -60,7 +63,6 @@ def createUser(request,email,password):
     enc = hashlib.sha256(str(password).encode('utf-8')).hexdigest()
     
     try:
-        # client = boto3.client('dynamodb')
         dynamodb = boto3.resource('dynamodb')
         table = dynamodb.Table('user')
         name ='아무개'
@@ -72,19 +74,25 @@ def createUser(request,email,password):
                 "email":email,
                 "password": enc,
                 "userinfo":{
-                    'name':name,
+                    'uname':name,
                     'room':room,
-                    'desc':'',
                 }
             },
             ConditionExpression= 'attribute_not_exists(email)'
         )
-        if response['ResponseMetadata']['HTTPStatusCode']==200:
-            request.session['user']=email
-            CacheUser(email=email,name='아무개',room=room).cacheUser()
-            return True
-        
-        return False
+        table = dynamodb.Table('room')
+        response = table.put_item(
+            # TableName='user',
+            Item= {
+                "roomid":room,
+                "roominfo":{
+                    'rname':name+'의 spacesheep',
+                    'bg': None,
+                }
+            },
+            ConditionExpression= 'attribute_not_exists(room)'
+        )
+        return room
 
     except ClientError as e:
         if e.response['Error']['Code'] == "ConditionalCheckFailedException":
@@ -119,7 +127,7 @@ def getUserinfo(email):
         response = table.get_item(
             Key={'email': email},
         )
-        if response['ResponseMetadata']['HTTPStatusCode'] == 200:
+        if 'Item' in response.keys():
             return response['Item']['userinfo']
         
     except ClientError as e:
@@ -128,12 +136,12 @@ def getUserinfo(email):
 def getRoominfo(room):
     try:
         dynamodb = boto3.resource('dynamodb')
-        table = dynamodb.Table('user')
+        table = dynamodb.Table('room')
         response = table.get_item(
-            Key={'room': email},
+            Key={'roomid':room},
         )
-        if response['ResponseMetadata']['HTTPStatusCode'] == 200:
-            return response['Item']['userinfo']
+        if 'Item' in response.keys():
+            return response['Item']['roominfo']
         
     except ClientError as e:
         print(e)
