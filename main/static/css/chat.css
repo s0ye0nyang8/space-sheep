@@ -54,23 +54,26 @@ body {
   .top_menu .title h1{
     font-size: 20px;
   }
+  .messages .message .text_wrapper {
+    max-width: 200px;
+  }
   .bottom_wrapper.clearfix .chat-footer {
     padding: 2;
   }
   .bottom_wrapper.clearfix .chat-footer .message_input {
-    padding: 10px 55px 25px 10px
+    padding: 10px 85px 25px 10px
   }
   .bottom_wrapper.clearfix .chat-footer .send-message-button {
     width: 28px;
     height: 28px;
     right: 15px;
-    font-size: 16px;
+    font-size: 25px;
   }
   .bottom_wrapper.clearfix .chat-footer .upload_photo {
     /* margin: 5; */
     width: 22px;
     height: 22px;
-    right: 45px;
+    right: 58px;
     font-size: 22px;
   }
 }
@@ -149,7 +152,7 @@ body {
 .messages .message .text_wrapper {
   display: inline-block;
   padding: 7px;
-  max-width: 200px;
+  max-width: 230px;
   min-width: 10px;
   position: relative;
 }
@@ -239,7 +242,7 @@ body {
   position: absolute;
   width: 35px;
   height: 35px;
-  right: 100px;
+  right: 40px;
   top: 0;
   bottom: 0;
   background-color: white;
@@ -252,7 +255,7 @@ body {
 }
 
 .chat-footer .send-message-button > i {
-  font-size: 16px;
+  font-size: 25px;
   margin: 0 0 0 -2px;
   color: #f5886e;
 }
@@ -265,9 +268,9 @@ body {
 .chat-footer .upload_photo {
   display: block;
   position: absolute;
-  right: 50px;
+  right: 88px;
   height: 30px;
-  font-size: 25px;
+  font-size: 28px;
   top: 0;
   bottom: 0;
   margin: auto;
@@ -412,4 +415,41 @@ body {
     opacity: 1;
     left: 0;
   }
+}
+
+#t-button {
+  text-decoration: none;
+  display: inline-block;
+  background-color: #333;
+  width: 45px;
+  height: 45px;
+  text-align: center;
+  border-radius: 4px;
+  position: fixed;
+  top: 65px;
+  right: 15px;
+  transition: background-color .3s, opacity .5s, visibility .5s;
+  opacity: 0;
+  visibility: hidden;
+  z-index: 1000;
+}
+#t-button::after {
+  content:"\f077";
+  font-family: FontAwesome;
+  font-weight: normal;
+  font-style: normal;
+  font-size: 2em;
+  line-height: 45px;
+  color: #fff;
+}
+#t-button:hover {
+  cursor: pointer;
+  background-color: #333;
+}
+#t-button:active {
+  background-color: #555;
+}
+#t-button.show {
+  opacity: 1;
+  visibility: visible;
 }

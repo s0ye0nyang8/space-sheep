@@ -1,14 +1,13 @@
 from botocore.exceptions import ClientError
 from boto3.dynamodb.types import TypeSerializer
 from boto3.dynamodb.conditions import Key
-from django.core.cache import cache
-
-import asyncio
 import boto3 
+from django.core.cache import cache
+import asyncio
 
 async def batch_write():
     alluser = await getAllUser()
-    
+    print(alluser)
     tasks = []
     
     if alluser:    
@@ -61,8 +60,9 @@ async def writetoDB(user):
             dynamodb.batch_write_item(RequestItems={
                 'chat-message': [{ 'PutRequest': { 'Item': item['content'] }}]
             })
-            print(f'resource, specify none      : write succeeded.')
+            print(f'{user}     : write succeeded.')
     except Exception as e:
-        print(f'resource, specify none      : write failed: {e}')
+        print(f'{user}      : write failed: {e}')
     except ClientError as e:
         print(e)
+

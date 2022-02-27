@@ -21,9 +21,7 @@ def delete_DBmessage(data):
         print(e)
     
 
-
 async def get_latest_messages(room,ExclusiveStartKey):
-    # print("get_latest_messages..")
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('chat-message')
     # option = ExclusiveStartKey=ExclusiveStartKey
@@ -31,7 +29,7 @@ async def get_latest_messages(room,ExclusiveStartKey):
         if ExclusiveStartKey is not None:
             response = table.query(
                 KeyConditionExpression=Key('owner').eq(room),
-                Limit=40,
+                Limit=30,
                 ScanIndexForward=False,
                 ConsistentRead=True,
                 ExclusiveStartKey=ExclusiveStartKey
@@ -39,11 +37,10 @@ async def get_latest_messages(room,ExclusiveStartKey):
         else:
             response = table.query(
                 KeyConditionExpression=Key('owner').eq(room),
-                Limit=40,
+                Limit=30,
                 ScanIndexForward=False,
                 ConsistentRead=True,
             )
-            # print(response['Items'])
         return response['Items']
 
     except ClientError as e:
@@ -63,7 +60,7 @@ async def create_presigned_post(method, bucket_name, object_name):
         url = boto3.client('s3').generate_presigned_url(
             ClientMethod=method, 
             Params={'Bucket': bucket_name, 'Key': object_name},
-            ExpiresIn=72*600)
+            ExpiresIn=7*24*600)
         # encoded = base64.urlsafe_b64encode(bytes(url, 'UTF-8')).decode("UTF-8")#.rstrip("=")
         # print("encoded url:",encoded)
         
@@ -73,9 +70,6 @@ async def create_presigned_post(method, bucket_name, object_name):
     except ClientError as e:
         print(e)
         return None 
-
-
-    
 
 
 

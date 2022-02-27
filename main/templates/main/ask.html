@@ -12,6 +12,7 @@
       </head>
       <body>
         <div class="chat_window">
+            <a id="t-button"></a>
             <div class="top_menu"> 
                 <div class="title">
                     <h1>{{roominfo.name}}</h1>
@@ -43,7 +44,7 @@
                 </div>
             </div>
             <!-- <div class="msg-area"> -->
-                <ul class="messages"></ul>
+            <ul class="messages"></ul>
             <!-- </div> -->
             <div class="bottom_wrapper clearfix">
                 <div style="display: none;" class="preview">
@@ -55,7 +56,7 @@
                 <div class="chat-footer">
                     <textarea class="message_input" maxlength="100" ></textarea>
                     <label class="upload_photo">
-                        <form hidden>
+                        <form id="myform" hidden>
                             <input id="myfile" type="file" accept="img/*" hidden/>
                         </form>
                         <i class="fa fa-paperclip"></i>
@@ -94,39 +95,45 @@
     var message_side = 'right';
     var MAX_WIDTH = 300;
     var MAX_HEIGHT = 300;
-    
+    var btncount = 1;
+
     var ta = document.querySelector(".message_input");
     ta.style.display = 'block';
     autosize(ta);
 
-    // var chatSocket = new WebSocket(
-    //     'ws://'+ window.location.host + '/home/' + 'ask/' + ROOMNAME 
-    // );
+    var chatSocket = new WebSocket(
+        'ws://'+ window.location.host + '/home/' + 'ask/' + ROOMNAME 
+    );
 
     chatSocket.onopen = function(e) {
         chatSocket.send(JSON.stringify({
             'command':'fetch_message',
             'message': {
-                'room':ROOMNAME,
+                'top_message':null,
             },
         }));
     }
     
-    async function newMessages(messages){
-        for(var message of messages.reverse()){
-            await newMessage(message);
+    async function newMessages(messages,top=null){
+        console.log(messages.length);
+        if (top===null){
+            this.m = messages.reverse();
         }
-        $messages =$('.messages');
-        $messages.animate({scrollTop: $messages.prop('scrollHeight')*2});
+        else{
+            this.m = messages;
+        }
+        for(var message of this.m){
+            await newMessage(message,top);
+        }
     }
 
-    async function newMessage(message){
+    async function newMessage(message,top=null){
         // download image and convert into url
         var content = message['content']
         var mid = message['mid']
         var message_box;
         
-        var message_side = USER == content['user'] ? 'right':'left';
+        var message_side = ROOMNAME === content['user'] ? 'left':'right';
         var url= null;
 
         if (content['media']==null) {
@@ -137,18 +144,31 @@
             mid: mid,
             image: content["media"],
             text: content['text'],
-            message_side: message_side
+            message_side: message_side,
         });
 
-        message_box.draw();
-        // $messages =$('.messages');
-        // $messages.scrollTop($messages.prop('scrollHeight'));
+        console.log(top);
+
+        if (top === null){
+            $('.messages').append(message_box);
+            return setTimeout(function () {
+                return message_box.addClass('appeared');
+            }, 0);
+        }
+        else{
+            // firstchild = $(`.messages #${top}`);
+            $('.messages').prepend(message_box);
+            // message_box.prependTo(firstchild);
+            return setTimeout(function () {
+                return message_box.addClass('appeared');
+            }, 0);  
+        }
     }
 
-    async function getImagefromS3(url){
-        const res = await fetch(url);
-        return res; 
-    }
+    // async function getImagefromS3(url){
+    //     const res = await fetch(url);
+    //     return res; 
+    // }
 
     $("ul.messages").on("click", "button[class='m_share']", function (e) {
         $this_message = $(this).closest('li.message');
@@ -173,8 +193,24 @@
         else if (command=="delete_message") {
             deleteMessage(content);
         }
+        else if (command=="fetch_message"){
+            var top_message = message['top_message'];
+
+            newMessages(content,top_message);
+            
+            if (top_message===null){
+                $messages =$('.messages');
+                $messages.animate({scrollTop: $messages.prop('scrollHeight')*2});
+            }
+            else{
+                $messages =$('.messages');
+                $messages.animate({scrollTop:0});
+            }
+        }
         else{
             newMessages(content);
+            $messages =$('.messages');
+            $messages.animate({scrollTop: $messages.prop('scrollHeight')*2});
         }
     };
 
@@ -184,48 +220,37 @@
 
     function Message(arg) {
         this.text = arg.text, this.message_side = arg.message_side, this.image=arg.image, this.mid=arg.mid;
+        this.message;
+        var $message;
+        var filename = "";
+        $message = $($('.message_template').clone(true).html());
+        $message.addClass(this.message_side);
+        $message.attr("id",this.mid);
         
-        this.draw = function (_this) {
-            return function () {
-                var $message;
-                var filename = "";
-                $message = $($('.message_template').clone(true).html());
-                $message.addClass(_this.message_side);
-                $message.attr("id",_this.mid);
-                
-                if(_this.text!=null){
-                    $message.find('.text').html( _this.text);
-                    $message.css("font-family","")
-                }
-                
-                if(_this.image!=null){
-                    
-                    let scaledImg = new Image();
-                    let imageLink = document.createElement("a");
-                    
-                    imageLink.setAttribute("href", _this.image);
-                    imageLink.setAttribute('download', `${_this.mid}.webp`);
+        if(this.text!=null){
+            $message.find('.text').html( this.text);
+            $message.css("font-family","")
+        }
+        
+        if(this.image!=null){
+            
+            let scaledImg = new Image();
+            let imageLink = document.createElement("a");
+            
+            imageLink.setAttribute("href", this.image);
+            imageLink.setAttribute('download', `${this.mid}.webp`);
 
-                    scaledImg.onload = function () {
-                        imageLink.appendChild(scaledImg);
-                        $message.find(".m_imagediv").prepend(imageLink);
-                    };
-                    
-                    scaledImg.setAttribute("src", _this.image);
-                    
-                    $message.prepend(imageLink);
-                    // $message.find(".m_imagediv img").attr('src', _this.image);
-                    
-                    // $message.find(".m_imagediv").prepend(imageLink);
-                }
-                $('.messages').append($message);
-                
-                return setTimeout(function () {
-                    return $message.addClass('appeared');
-                }, 0);
+            scaledImg.onload = function () {
+                imageLink.appendChild(scaledImg);
+                $message.find(".m_imagediv").prepend(imageLink);
             };
-        }(this);
-        return this;
+            
+            scaledImg.setAttribute("src", this.image);
+            
+            $message.prepend(imageLink);
+            
+        }
+        return $message;
     };
 
     
@@ -235,6 +260,7 @@
         message =  $message_input.val().trim();
         message = message.replaceAll(/(\n|\r\n)/g, '<br/>');
         message = removeHTMLTag(message);
+        message = autolink(message);
 
         return message;
     };
@@ -244,6 +270,13 @@
         var substitute = "&lt;$1$2&gt;";
         return m.replaceAll(pattern,substitute);
     }
+
+    function autolink(m) {
+        var regURL = new RegExp("(http|https|ftp|telnet|news|irc)://([-/.a-zA-Z0-9_~#%$?&=:200-377()]+)","gi");
+        var regEmail = new RegExp("([xA1-xFEa-z0-9_-]+@[xA1-xFEa-z0-9-]+\.[a-z0-9-]+)","gi");
+        return m.replace(regURL,"<a href='$1://$2' target='_blank'>$1://$2</a>").replace(regEmail,"<a href='mailto:$1'>$1</a>");
+    }
+
 
 
     $('.delete_photo').click(async function (e) {
@@ -281,6 +314,7 @@
         else{
             this.media = this.file;
         }
+        // reset_input();
         return await fetch(url,{
             method:'PUT',
             body:this.media
@@ -292,7 +326,8 @@
     }
 
     function reset_input(){
-        $("form").get(0).reset();
+        $("#myform").get(0).reset();
+        // $('#myfile')[0].select();
         ta.value='';
         autosize.update(ta);
     }
@@ -337,19 +372,18 @@
             'command':'new_message',
             'message':message,
         }));
-        
         reset_input();
     }
 
-    $('.message_input').keyup(function (e) {
-        autosize.update(ta);
-        if (e.which === 13) {
-            if (!event.shiftKey){
-                $('.send-message-button').click();
-            }
-        }
-    });
-    
+    // $('.message_input').keyup(function (e) {
+    //     autosize.update(ta);
+    //     if (e.which === 13) {
+    //         if (!event.shiftKey){
+    //             $('.send-message-button').click();
+    //         }
+    //     }
+    // });
+
     function remove_preview(){
         $(".previewdiv img").remove();
         $(".preview").css("display","none");
@@ -422,4 +456,28 @@
         $('#overlay').toggleClass('open');
         // $(".fullscreen").slideToggle();
     });
+    
+    var btn = $('#t-button');
+    $('.messages').scroll(function() {
+        if ($('.messages').scrollTop() < 100) {
+            btn.addClass('show');
+        } else {
+            btn.removeClass('show');
+        }
+    });
+    
+    // $messages.animate({scrollTop: $messages.prop('scrollHeight')*2});
+    btn.on('click', function(e) {
+        e.preventDefault();
+        mid = $('.messages li:nth-child(1)').attr('id')
+        btncount +=1;
+        chatSocket.send(JSON.stringify({
+            'command':'fetch_message',
+            'message': {
+                'top_message':mid,
+            },
+        }));
+    });
+
+
 </script>

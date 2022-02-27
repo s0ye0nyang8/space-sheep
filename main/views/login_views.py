@@ -28,7 +28,7 @@ def login(request):
 
         if uinfo:
             CacheUser(email=email,room=uinfo['room'],name=uinfo['uname']).cacheUser()
-            CacheRoom(roomid=uinfo['room']).cacheRoom()
+            # CacheRoom(roomid=uinfo['room']).cacheRoom()
             next_url = request.POST.get('next') or "home" 
             # enc = parse.quote(self.user.getCachedRoom().encode('utf-8'))
             return redirect(next_url)
@@ -54,7 +54,7 @@ def signup(request):
             if roomid:
                 request.session['user']=email
                 CacheUser(email=email,name='아무개',room=roomid).cacheUser()
-                CacheRoom(roomid=roomid).cacheRoom()
+                # CacheRoom(roomid=roomid).cacheRoom()
                 next_url = request.GET.get('next') or "home"
                 return redirect(next_url)
         else:

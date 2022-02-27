@@ -5,7 +5,7 @@ from datetime import datetime
 from django.conf import settings
 from .cache import *
 from .dynamodbchat import *
-from .batch_writeDB import batch_write
+from .batch_write_task import batch_write
 import time, json
 import base64, random
 import requests 
@@ -16,10 +16,7 @@ class AskConsumer(AsyncWebsocketConsumer):
     blocklist = []
 
     async def new_message(self,data):
-        # print("new message!!")
-        # mid 생성
         mid = '_'.join([self.room_name,data['timestamp']])
-        # print(mid)
         url = None
         # message caching 
         if data['media'] is not None:
@@ -39,7 +36,7 @@ class AskConsumer(AsyncWebsocketConsumer):
         latestkey = await getCachedLatestKey(room=self.room_name)
         CacheMessage(mid=mid,nextkey=latestkey,content=message).cacheMessage()
 
-        cacheLatestKey(room=self.room_name,mid=mid)
+        setLatestKey(room=self.room_name,mid=mid)
 
         await self.channel_layer.group_send(
             self.room_group_name, {
@@ -79,18 +76,20 @@ class AskConsumer(AsyncWebsocketConsumer):
             }))
 
     async def fetch_message(self,data):
-        # print("fetch..")
-        
-        latest_mid = await getCachedLatestKey(self.room_name)
-        
-        messages = await get_cached_data(room=self.room_name, latest_mid=latest_mid)
-        
+        # await batch_write()
+        top_message = data['top_message']
+        if top_message is not None:
+            messages = await get_cached_data(room=self.room_name, startkey=top_message)
+            del messages[0]
+        else:
+            latest_mid = await getCachedLatestKey(self.room_name)
+            messages = await get_cached_data(room=self.room_name, startkey=latest_mid)
+        # print(len(messages))
         await self.send(text_data=json.dumps({
             "command":"fetch_message",
             "message": messages,
+            "top_message":top_message,
         }))
-
-        # await batch_write()
 
     commands = {
         'fetch_message':fetch_message,
@@ -115,7 +114,6 @@ class AskConsumer(AsyncWebsocketConsumer):
     # Receive message from WebSocket
     async def receive(self, text_data): 
         data = json.loads(text_data)
-        # print("recieved from socket :", data['command'])
         await self.commands[data['command']](self,data['message'])
         
 
