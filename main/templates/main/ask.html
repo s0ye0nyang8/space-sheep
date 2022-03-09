@@ -200,21 +200,35 @@
             newMessages(content,top_message);
             
             if (top_message===null){
-                $messages =$('.messages');
-                $messages.animate({scrollTop: $messages.prop('scrollHeight')*2});
+                scrollmessage();
             }
             else{
                 $messages =$('.messages');
-                $messages.animate({scrollTop:0});
+                $messages.animate({scrollTop:0},0.4);
             }
         }
         else{
             newMessages(content);
-            $messages =$('.messages');
-            $messages.animate({scrollTop: $messages.prop('scrollHeight')*2});
+            scrollmessage();
         }
     };
+    var isPressed =false;
+    
+    $('messages').bind("touchmove",function(e){
+        isPressed=true;
+    })
+    
+    $('messages').bind('mousedown', function(e) {
+        isPressed = true;
+        doInterval('-1');
+    });
 
+    function scrollmessage(){
+        if (isPressed==false){
+            $messages =$('.messages');
+            $messages.animate({scrollTop: $messages.prop('scrollHeight')*2},0.3);
+        }
+    }
     chatSocket.onclose = function(e) {
         console.error('Chat socket closed unexpectedly');
     };
