@@ -1,6 +1,6 @@
 from django.core.cache import cache
 from .dynamodbchat import get_latest_messages
-from .dynamodbauth import getRoominfo
+from .dynamodbauth import getRoominfo, updateRoomInfo
 from django.http import Http404  
 
 class CacheUser:
@@ -119,11 +119,9 @@ async def get_cached_data(room,resource=None,startkey=None):
             return []
     
     # at least 1 cache data
-    cnt = 3
-    tmp = key
-
-    while cnt>0 and tmp is not None :
-        message = CacheMessage(tmp).getMessage()
+    cnt = 15
+    message = CacheMessage(key).getMessage()
+    while cnt>0 and message['content'] is not None :
         messages.append(message['content'])
 
         if message['next'] is None:
@@ -132,44 +130,52 @@ async def get_cached_data(room,resource=None,startkey=None):
                 'owner': message['content']['content']['owner'],
                 'timestamp':message['content']['content']['timestamp'],
             }
-            key = await cacheNewDBMessage(room,ExclusiveStartKey)
+            nextkey = await cacheNewDBMessage(room,ExclusiveStartKey)
             # connect to previous cache
-            if key is None: # real end
+            if nextkey is None: # real end
                 return messages
-            CacheMessage(tmp,nextkey=key,content=message['content']).cacheMessage()
-            tmp = key
+            CacheMessage(key,nextkey=nextkey,content=message['content']).cacheMessage()
+            message = CacheMessage(nextkey).getMessage()
         else:
-            tmp = message['next']
+            message = CacheMessage(message['next']).getMessage()
+
         cnt -=1
 
     return messages
 
-# class CacheRoom:
-#     def __init__(self, roomid, name=None, bg=None):
-#         self.room = roomid
-#         self.roomname = name
-#         self.bg=bg
-#         if self.roomname is None:
-#             # roominfo = cache.get(roomid)
-#             # if roominfo is not None:
-#             #     self.roomname = roominfo['name']
-#             #     self.bg = roominfo['bg']
-#             # else:
-#             roominfo = getRoominfo(roomid)
-#             if roominfo is not None:
-#                 self.roomname = roominfo['rname']
-#                 self.bg = roominfo['bg']
+class CacheRoom:
+    def __init__(self, roomid, name=None, bg=None):
+        self.room = roomid
+        self.roomname = name
+        self.bg=bg
+        if self.roomname is None:
+            roominfo = cache.get(roomid)
+            if roominfo is not None:
+                self.roomname = roominfo['name']
+                self.bg = roominfo['bg']
+            else:
+                roominfo = getRoominfo(self.room)
+                if roominfo is not None:
+                    self.roomname = roominfo['rname']
+                    self.bg = roominfo['bg']
 
-#     def cacheRoom(self):
-#         roominfo = {
-#             'name':self.roomname,
-#             'bg':self.bg
-#         }
-#         cache.set(self.room,roominfo,timeout=None)
+    def cacheRoom(self):
+        roominfo = {
+            'name':self.roomname,
+            'bg':self.bg
+        }
+        cache.set(self.room,roominfo,timeout=None)
 
-#     def getName(self):
-#         return self.roomname
+    def updateCacheRoom(self,name,bg):
+        print('update')
+        self.roomname= name
+        self.bg = bg
+        self.cacheRoom()
+        return updateRoomInfo(self.room,name,bg)
 
-#     def getBg(self):
-#         return self.bg
+    def getName(self):
+        return self.roomname
+
+    def getBg(self):
+        return self.bg
         

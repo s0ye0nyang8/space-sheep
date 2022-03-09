@@ -1,6 +1,6 @@
 <!DOCTYPE HTML5>
-    {% load static %}
     <html>
+      {% load static %}
       <head>
         <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
@@ -10,12 +10,13 @@
         <meta property="og:description" content="초대장 -🐏- ">
         <meta property="og:image" content="{% static 'images/대문.png'%}">
       </head>
-      <body>
-        <div class="chat_window">
+      <body width="100%" height="100%">
+        <div class="chat_window" id="mybackground">
             <a id="t-button"></a>
             <div class="top_menu"> 
                 <div class="title">
-                    <h1>{{roominfo.name}}</h1>
+                    <h1>{{name}}</h1>
+                    {% if user == room_name %}
                     <div class="menu-btn">
                         <div class="btn_container" id="toggle">   <!-- 버튼 만들기 위한 큰 틀  버튼 활성화를 위한 토글 -->
                             <span class="top"></span>         <!-- 햄버거의 맨 위 막대기 -->
@@ -25,22 +26,26 @@
                         <div class="overlay" id="overlay">
                             <nav class="overlay-menu">
                                 <ul>
-                                    <li>정보 수정</li>
+                                    <h2>스쉽꾸미기</h2>
                                     <form id="update-form" method="post" enctype="multipart/form-data" role="form" style="display: block;">
                                         {% csrf_token %}
-                                        <li>    
-                                            <input class="romm-info" name="rname" placeholder="채팅방 이름">
-                                            <!-- <input class="romm-info" type="file" accept="img/*" name="bg-file" placeholder="채팅방 배경">     -->
-                                            <!-- <div class="bg-preview"></div> -->
+                                        <li> 
+                                            채팅방 이름
+                                            <input class="room-info" id ="rname" name="rname">
                                         </li>
+                                    
                                         <li>
-                                            <input type="submit" value="확인">
+                                            채팅방 배경
+                                            <input class="room-info" id="bg-file" type="file" accept="img/*" name="bg-file">
                                         </li>
+                                        <input id="user-setting" type="submit" value="확인">
+                                        <input id="horang" type="submit" value="🐯">
                                     </form>
                                 </ul>
                             </nav>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
             <!-- <div class="msg-area"> -->
@@ -91,7 +96,6 @@
 <script type="text/javascript">
     var ROOMNAME = "{{room_name|escapejs}}";
     var USER = "{{user|escapejs}}";
-    var ROOMINFO = "{{roominfo|escapejs}}";
     var message_side = 'right';
     var MAX_WIDTH = 300;
     var MAX_HEIGHT = 300;
@@ -100,10 +104,14 @@
     var ta = document.querySelector(".message_input");
     ta.style.display = 'block';
     autosize(ta);
+    var url ="https://sheep-1.s3.ap-northeast-2.amazonaws.com/"+ROOMNAME;
 
+    $("#mybackground").css({"background":`url(${url})`}); 			
+    
     var chatSocket = new WebSocket(
         'ws://'+ window.location.host + '/home/' + 'ask/' + ROOMNAME 
     );
+
 
     chatSocket.onopen = function(e) {
         chatSocket.send(JSON.stringify({
@@ -112,10 +120,10 @@
                 'top_message':null,
             },
         }));
+
     }
     
     async function newMessages(messages,top=null){
-        console.log(messages.length);
         if (top===null){
             this.m = messages.reverse();
         }
@@ -147,8 +155,6 @@
             message_side: message_side,
         });
 
-        console.log(top);
-
         if (top === null){
             $('.messages').append(message_box);
             return setTimeout(function () {
@@ -164,11 +170,6 @@
             }, 0);  
         }
     }
-
-    // async function getImagefromS3(url){
-    //     const res = await fetch(url);
-    //     return res; 
-    // }
 
     $("ul.messages").on("click", "button[class='m_share']", function (e) {
         $this_message = $(this).closest('li.message');
@@ -454,7 +455,7 @@
     $("#toggle").click(function() {
         $(this).toggleClass("active");
         $('#overlay').toggleClass('open');
-        // $(".fullscreen").slideToggle();
+        $('form').get(0).reset();
     });
     
     var btn = $('#t-button');
@@ -478,6 +479,18 @@
             },
         }));
     });
+
+    // $('#bg-file').on('change',function(e){
+    //     var f = e.target.files[0];
+    //     var filereader = new FileReader();
+    //     console.log("file changed");
+        
+    //     filereader.onload = function(e){
+    //         $.post(e.target.result);
+    //         // $('messages').css('background-image',e.target.result);
+    //     }
+    //     filereader.readAsDataURL(f);
+    // });
 
 
 </script>

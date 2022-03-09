@@ -26,8 +26,8 @@ def updateRoomInfo(request,roomid,name,bg):
     try:
         response = table.update_item(
             Key={'roomid': roomid},
-            UpdateExpression="SET roominfo.rname=:n" ,
-            ExpressionAttributeValues= {':n': name}
+            UpdateExpression="SET roominfo.rname=:n, roominfo.bg=:b" ,
+            ExpressionAttributeValues= {':n': name, ':b':bg}
         )
         return response
 
@@ -129,6 +129,8 @@ def getUserinfo(email):
         )
         if 'Item' in response.keys():
             return response['Item']['userinfo']
+        else:
+            return None
         
     except ClientError as e:
         print(e)
@@ -142,6 +144,8 @@ def getRoominfo(room):
         )
         if 'Item' in response.keys():
             return response['Item']['roominfo']
+        else:
+            return None
         
     except ClientError as e:
         print(e)

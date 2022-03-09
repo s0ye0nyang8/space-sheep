@@ -71,5 +71,26 @@ async def create_presigned_post(method, bucket_name, object_name):
         print(e)
         return None 
 
+def uploadImageS3(file,owner):
+    try:
+        response = boto3.client('s3').put_object(
+            ACL='public-read',
+            Body=file,
+            Bucket='sheep-1',
+            Key=owner
+        )
+        print("upload",response)
+        return response
+    except ClientError as e:
+        print(e)
 
-
+# def getImageS3(filename):
+#     try:
+#         response = boto3.client('s3').get_object(
+#             Bucket='sheep-1',
+#             Key=filename
+#         )
+#         return response['Body']
+#     except ClientError as e:
+#         print(e)
+#         return None 

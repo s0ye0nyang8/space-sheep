@@ -5,7 +5,7 @@ from datetime import datetime
 from django.conf import settings
 from .cache import *
 from .dynamodbchat import *
-from .batch_write_task import batch_write
+# from .batch_write_task import batch_write
 import time, json
 import base64, random
 import requests 

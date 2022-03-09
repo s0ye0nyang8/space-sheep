@@ -7,46 +7,48 @@ from urllib import parse
 # for s3 presigned URL
 import logging
 import boto3
-from ..dynamodbauth import getRoominfo, updateRoomInfo
-
+from ..dynamodbauth import updateRoomInfo
+from ..dynamodbchat import uploadImageS3
+from ..cache import CacheRoom
 from botocore.exceptions import ClientError
 import uuid
 
 def ask(request,room_name):
-    if request.method == 'GET':
-        user_id = request.session.get('user') # 세션으로부터 유저 정보 가져오기
-        myroom = CacheUser(user_id).getCachedRoom()
-        
-        # room info 는 cache 굳이?
-        # thisroom = CacheRoom(room_name)
-        # name = thisroom.getName()
-        # bg = thisroom.getBg()
+    user_id = request.session.get('user') 
+    myroom = CacheUser(user_id).getCachedRoom()
+    roominfo= {}
+    thisroom = CacheRoom(room_name)
 
-        rinfo = getRoominfo(room_name)
+    if request.method == 'GET':
+        name = thisroom.getName()
+        
         return render(request, 'main/ask.html', {
             'room_name':room_name,
-            'roominfo': {
-                'name':rinfo['rname'],
-                'bg':rinfo['bg']
-            },
+            'name':name,
             'user': myroom,
         })
 
     if request.method == 'POST':
-        user_id = request.session.get('user') 
-        myroom = CacheUser(user_id).getCachedRoom()
-        
+        name =None
+        bg=None
         if myroom==room_name:
-            name = request.POST.get('rname')
-
-            updateRoomInfo(request,room_name,name,None)
-            # CacheRoom(room_name,name,None).cacheRoom()
+            try:
+                name = request.POST.get('rname')
+                bg = request.FILES['bg-file']
+                
+                res = uploadImageS3(bg,room_name)
+                res = CacheRoom(room_name).updateCacheRoom(name,bg.name)
+            except:
+                thisroom = CacheRoom(room_name)
+                if name is None:
+                    name = thisroom.getName()
+                pass
             
             return render(request, 'main/ask.html', {
-                'room_name':room_name,
-                'roominfo': {
+                    'room_name':room_name,
                     'name':name,
-                    # 'bg':bg
-                },
-                'user': myroom,
-            })
+                    'user': myroom,
+                })
+        else:
+            pass
+            
