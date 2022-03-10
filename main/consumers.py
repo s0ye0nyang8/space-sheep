@@ -84,6 +84,7 @@ class AskConsumer(AsyncWebsocketConsumer):
         else:
             latest_mid = await getCachedLatestKey(self.room_name)
             messages = await get_cached_data(room=self.room_name, startkey=latest_mid)
+
         # print(len(messages))
         await self.send(text_data=json.dumps({
             "command":"fetch_message",

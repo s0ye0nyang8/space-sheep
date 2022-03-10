@@ -48,29 +48,29 @@ class CacheMessage:
         self.content = None
 
         if content is not None:
-            self.next = nextkey
+            self.nextkey = nextkey
             self.content = content
         else:
             node = cache.get(self.mid)
             if node is not None:
-                self.next = node['next']
+                self.nextkey = node['next']
                 self.content = node['content']
     
     def cacheMessage(self):
-        cache.set(self.mid, {'next':self.next, 'content':self.content}, timeout=None)
+        cache.set(self.mid, {'next':self.nextkey, 'content':self.content}, timeout=None)
 
     def deleteMessage(self):
         tmp = self.content
         tmp['content']['text'] = None
         tmp['content']['media'] = None
 
-        cache.set(self.mid, {'next':self.next, 'content':tmp}, timeout=None)
+        cache.set(self.mid, {'next':self.nextkey, 'content':tmp}, timeout=None)
 
     def getMessage(self):
-        return {'next':self.next, 'content':self.content}
+        return {'next':self.nextkey, 'content':self.content}
     
     def getNext(self):
-        return self.next
+        return self.nextkey
 
     def getContent(self):
         return self.content
@@ -147,35 +147,27 @@ class CacheRoom:
     def __init__(self, roomid, name=None, bg=None):
         self.room = roomid
         self.roomname = name
-        self.bg=bg
         if self.roomname is None:
             roominfo = cache.get(roomid)
             if roominfo is not None:
                 self.roomname = roominfo['name']
-                self.bg = roominfo['bg']
             else:
                 roominfo = getRoominfo(self.room)
                 if roominfo is not None:
                     self.roomname = roominfo['rname']
-                    self.bg = roominfo['bg']
 
     def cacheRoom(self):
         roominfo = {
-            'name':self.roomname,
-            'bg':self.bg
+            'name':self.roomname
         }
         cache.set(self.room,roominfo,timeout=None)
 
-    def updateCacheRoom(self,name,bg):
-        print('update')
+    def updateCacheRoom(self,name):
         self.roomname= name
-        self.bg = bg
         self.cacheRoom()
-        return updateRoomInfo(self.room,name,bg)
+        return updateRoomInfo(self.room, name)
 
     def getName(self):
         return self.roomname
 
-    def getBg(self):
-        return self.bg
         

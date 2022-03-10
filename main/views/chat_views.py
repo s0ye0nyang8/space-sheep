@@ -7,7 +7,7 @@ from urllib import parse
 # for s3 presigned URL
 import logging
 import boto3
-from ..dynamodbauth import updateRoomInfo
+
 from ..dynamodbchat import uploadImageS3
 from ..cache import CacheRoom
 from botocore.exceptions import ClientError
@@ -32,16 +32,15 @@ def ask(request,room_name):
         name =None
         bg=None
         if myroom==room_name:
+            name = request.POST.get('rname')
+            thisroom = CacheRoom(room_name)
+            if name is None:
+                name=thisroom.getName()
+            res = CacheRoom(room_name).updateCacheRoom(name)
             try:
-                name = request.POST.get('rname')
                 bg = request.FILES['bg-file']
-                
                 res = uploadImageS3(bg,room_name)
-                res = CacheRoom(room_name).updateCacheRoom(name,bg.name)
             except:
-                thisroom = CacheRoom(room_name)
-                if name is None:
-                    name = thisroom.getName()
                 pass
             
             return render(request, 'main/ask.html', {

@@ -20,21 +20,20 @@ def updateUserInfo(request,email,name,desc):
         print(e)
         # raise Http404("User does not exist")
 
-def updateRoomInfo(request,roomid,name,bg):
+def updateRoomInfo(roomid,name):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('room')
     try:
         response = table.update_item(
             Key={'roomid': roomid},
-            UpdateExpression="SET roominfo.rname=:n, roominfo.bg=:b" ,
-            ExpressionAttributeValues= {':n': name, ':b':bg}
+            UpdateExpression="SET roominfo.rname=:n" ,
+            ExpressionAttributeValues= {':n': name}
         )
         return response
 
     except ClientError as e:
         print(e)
 
-        # raise Http404("Room does not exist")
 
 def myauthenticate(request,email,password):
     try:
@@ -87,7 +86,6 @@ def createUser(request,email,password):
                 "roomid":room,
                 "roominfo":{
                     'rname':name+'의 spacesheep',
-                    'bg': None,
                 }
             },
             ConditionExpression= 'attribute_not_exists(room)'

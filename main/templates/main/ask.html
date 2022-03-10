@@ -33,13 +33,12 @@
                                             채팅방 이름
                                             <input class="room-info" id ="rname" name="rname">
                                         </li>
-                                    
                                         <li>
                                             채팅방 배경
                                             <input class="room-info" id="bg-file" type="file" accept="img/*" name="bg-file">
                                         </li>
                                         <input id="user-setting" type="submit" value="확인">
-                                        <input id="horang" type="submit" value="🐯">
+                                        <!-- <input id="horang" type="submit" value="🐯"> -->
                                     </form>
                                 </ul>
                             </nav>
@@ -107,7 +106,7 @@
     var url ="https://sheep-1.s3.ap-northeast-2.amazonaws.com/"+ROOMNAME;
 
     $("#mybackground").css({"background":`url(${url})`}); 			
-    
+    $("#mybackground").css({"background-position": "center"});
     var chatSocket = new WebSocket(
         'ws://'+ window.location.host + '/home/' + 'ask/' + ROOMNAME 
     );
