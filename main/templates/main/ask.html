@@ -6,9 +6,6 @@
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'css/chat.css'%}">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta property="og:title" content="spacesheep">
-        <meta property="og:description" content="초대장 -🐏- ">
-        <meta property="og:image" content="{% static 'images/대문.png'%}">
       </head>
       <body width="100%" height="100%">
         <div class="chat_window" id="mybackground">
@@ -85,7 +82,7 @@
       </body>
     </html>
 
-<script src="http://code.jquery.com/jquery-latest.js"></script> 
+<script src="https://code.jquery.com/jquery-latest.js"></script> 
 <script src="https://rawgit.com/jackmoore/autosize/master/dist/autosize.min.js"></script> 
 <script src="https://unpkg.com/konva@8.3.0/konva.min.js"></script>
 <script src="https://unpkg.com/gifler@0.1.0/gifler.min.js"></script>
@@ -492,18 +489,5 @@
             },
         }));
     });
-
-    // $('#bg-file').on('change',function(e){
-    //     var f = e.target.files[0];
-    //     var filereader = new FileReader();
-    //     console.log("file changed");
-        
-    //     filereader.onload = function(e){
-    //         $.post(e.target.result);
-    //         // $('messages').css('background-image',e.target.result);
-    //     }
-    //     filereader.readAsDataURL(f);
-    // });
-
 
 </script>
