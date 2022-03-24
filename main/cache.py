@@ -143,31 +143,31 @@ async def get_cached_data(room,resource=None,startkey=None):
 
     return messages
 
-class CacheRoom:
-    def __init__(self, roomid, name=None, bg=None):
-        self.room = roomid
-        self.roomname = name
-        if self.roomname is None:
-            roominfo = cache.get(roomid)
-            if roominfo is not None:
-                self.roomname = roominfo['name']
-            else:
-                roominfo = getRoominfo(self.room)
-                if roominfo is not None:
-                    self.roomname = roominfo['rname']
+# class CacheRoom:
+#     def __init__(self, roomid, name=None, bg=None):
+#         self.room = roomid
+#         self.roomname = name
+#         if self.roomname is None:
+#             roominfo = cache.get(roomid)
+#             if roominfo is not None:
+#                 self.roomname = roominfo['name']
+#             else:
+#                 roominfo = getRoominfo(self.room)
+#                 if roominfo is not None:
+#                     self.roomname = roominfo['rname']
 
-    def cacheRoom(self):
-        roominfo = {
-            'name':self.roomname
-        }
-        cache.set(self.room,roominfo,timeout=None)
+#     def cacheRoom(self):
+#         roominfo = {
+#             'name':self.roomname
+#         }
+#         cache.set(self.room,roominfo,timeout=None)
 
-    def updateCacheRoom(self,name):
-        self.roomname= name
-        self.cacheRoom()
-        return updateRoomInfo(self.room, name)
+#     def updateCacheRoom(self,name):
+#         self.roomname= name
+#         self.cacheRoom()
+#         return updateRoomInfo(self.room, name)
 
-    def getName(self):
-        return self.roomname
+#     def getName(self):
+#         return self.roomname
 
         

@@ -7,13 +7,12 @@ import base64
 
 def delete_DBmessage(data):
     dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('chat-message')
-    mid = data['mid'].split('_')
+    table = dynamodb.Table('messages-1')
+    # mid = data['mid'].split('_')
     try:
         response = table.delete_item(
             Key={
-                'owner':mid[0],
-                'timestamp':mid[1],
+                'mid':mid,
             },
         )
         return response
@@ -21,26 +20,28 @@ def delete_DBmessage(data):
         print(e)
     
 
-async def get_latest_messages(room,ExclusiveStartKey):
+async def get_latest_messages(room,ExclusiveStartKey=None):
     dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('chat-message')
+    table = dynamodb.Table('messages-1')
     # option = ExclusiveStartKey=ExclusiveStartKey
     try:
         if ExclusiveStartKey is not None:
+            timestamp = int(ExclusiveStartKey.split('_')[1])
             response = table.query(
-                KeyConditionExpression=Key('owner').eq(room),
-                Limit=30,
+                KeyConditionExpression=Key('owner').eq(room)&Key('timestamp').lt(timestamp), 
+                Limit=10,
                 ScanIndexForward=False,
-                ConsistentRead=True,
-                ExclusiveStartKey=ExclusiveStartKey
+                ConsistentRead=True
             )
         else:
             response = table.query(
                 KeyConditionExpression=Key('owner').eq(room),
-                Limit=30,
+                Limit=10,
                 ScanIndexForward=False,
                 ConsistentRead=True,
             )
+        for i in response['Items']:
+            i['timestamp']=str(i['timestamp'])
         return response['Items']
 
     except ClientError as e:

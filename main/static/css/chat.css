@@ -12,6 +12,69 @@ body {
   font-family:'KyoboHand',"Calibri", "Roboto", sans-serif;
 }
 
+body.dimmed::before{
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(255,255,255, 0.75);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+
+.popup{
+  z-index: 1;
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  min-width: 300px;
+  max-width: 600px;
+  background-color: rgb(255, 238, 238);
+  border-radius: 15px;
+  border-color: #f5886e;
+  box-shadow: 0 2px 55px -25px rgb(0 0 0 / 100%);
+}
+
+.popup.close {
+  visibility: hidden;
+}
+
+.popup > .content {
+  text-align: center;
+  font-size: 15px;
+  padding: 20px;
+  padding-bottom: 0%;
+  box-sizing: border-box;
+}
+
+.popup > .cmd {
+
+  bottom: 0;
+  min-height: 30px;
+  padding: 15px 15px;
+  box-sizing: border-box;
+  border-radius: 0 0 15px 15px;
+  min-height: 40px;
+  text-align: center;
+}
+.popup > .cmd .close-btn {
+  border-radius: 8px;
+  width: 80px;
+  padding: 5px 10px;
+  background-color: transparent;
+  border: 1px solid crimson;
+  color: crimson;
+}
+.popup > .cmd .close-btn:hover {
+  color: #fff;
+  background-color: #000;
+  border-color: #000;
+}
+
 .chat_window {
   position: absolute;
   display: flex;
@@ -29,9 +92,11 @@ body {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
   overflow: hidden;
 }
+
 .menu-btn{
   margin: auto;
 }
+
 .top_menu {
   background-color:transparent;
   width: 100%;
@@ -56,6 +121,9 @@ body {
 }
 
 @media screen and (max-width: 500px) {
+  .popup{
+    width: 100%;
+  }
   /* For mobile phones: */
   .top_menu .title h1{
     font-size: 20px;

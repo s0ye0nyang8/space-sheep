@@ -9,22 +9,25 @@ import logging
 import boto3
 
 from ..dynamodbchat import uploadImageS3
-from ..cache import CacheRoom
+from ..dynamodbauth import getRoominfo, updateRoomInfo
 from botocore.exceptions import ClientError
 import uuid
+from ipware import get_client_ip
+
 
 def ask(request,room_name):
     user_id = request.session.get('user') 
     myroom = CacheUser(user_id).getCachedRoom()
-    roominfo= {}
-    thisroom = CacheRoom(room_name)
-
+    # roominfo= {}
+    # thisroom = CacheRoom(room_name)
+    client_ip, is_routable = get_client_ip(request)
+    print(client_ip,"entered room")
     if request.method == 'GET':
-        name = thisroom.getName()
-        
+        # name = thisroom.getName()
+        roominfo = getRoominfo(room_name)
         return render(request, 'main/ask.html', {
             'room_name':room_name,
-            'name':name,
+            'name':roominfo['rname'],
             'user': myroom,
         })
 
@@ -33,10 +36,11 @@ def ask(request,room_name):
         bg=None
         if myroom==room_name:
             name = request.POST.get('rname')
-            thisroom = CacheRoom(room_name)
+            # thisroom = CacheRoom(room_name)
             if name is None:
-                name=thisroom.getName()
-            res = CacheRoom(room_name).updateCacheRoom(name)
+                name=getRoominfo(room_name)
+            # res = CacheRoom(room_name).updateCacheRoom(name)
+            res = updateRoomInfo(room_name,name)
             try:
                 bg = request.FILES['bg-file']
                 res = uploadImageS3(bg,room_name)
