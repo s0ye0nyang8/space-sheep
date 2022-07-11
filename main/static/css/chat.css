@@ -1,19 +1,15 @@
 * {
   box-sizing: border-box;
 }
-@font-face { 
-  font-family: "Aldrich";
-  src: url("../font/Aldrich-Regular.ttf") format("truetype");
-  font-weight: normal;
-}
+@import url(//fonts.googleapis.com/earlyaccess/notosanskr.css);
 
 body {
+  font-family: 'Noto Sans KR', sans-serif;
+	font-weight: 400;
   background-color: #edeff2;
-  font-family:'Aldrich',"Calibri", "Roboto", sans-serif;
+	letter-spacing: -0.01em;
 }
-body.Calibri{
-  font-family: 'Aldrich',"Calibri", "Roboto", sans-serif;
-}
+
 
 body.dimmed::before{
   content: '';
@@ -153,13 +149,13 @@ body.dimmed::before{
   position: relative;
   clear: both;
   overflow: hidden;
-  margin-bottom: 0px;
+  margin-top: 5;
   transition: all 0.5s linear;
   opacity: 1;
 }
 .messages .message .text_wrapper {
   display: inline-block;
-  padding: 6px 6px;
+  padding: 3px 8px;
   max-width: 200px;
   min-width: 10px;
   position: relative;
@@ -169,8 +165,7 @@ body.dimmed::before{
   background-color:white;
   vertical-align: middle;
   border-radius: 0 8px 8px 8px;
-  /* margin: 1; */
-  margin-top: 5;
+  margin: 0;
   display: inline-block;
 }
 
@@ -178,8 +173,8 @@ body.dimmed::before{
   background-color:white;
   vertical-align: middle;
   border-radius: 8px 0px 8px 8px;
-  margin-top: 5;
-  margin-right: 7px;
+  margin-top: 0;
+  margin-right: 6px;
   float:right;
 }
 
@@ -189,19 +184,25 @@ body.dimmed::before{
 .messages .message.left button{
   background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
   width: 12;
+  height: 12;
   position: relative;
-  margin: 5px 0px;
+  margin: 2px 1px;
   padding-left: 0px;
   border: medium none;
   display:inline-block;
+  vertical-align: middle;
+  
+  /* float:right; */
+
 }
 .messages .message.right button{
   background: rgba(0, 0, 0, 0) none repeat scroll 0 0;
   width: 12;
+  height: 12;
   position: relative;
-  margin: 5px 0px;
+  margin: 2px 1px;
   padding-left: 0px;
-  /* vertical-align: middle; */
+  vertical-align: middle;
   border: medium none;
   float:right;
 }
@@ -209,13 +210,11 @@ body.dimmed::before{
   font-size: 10px;
   color: black;
 }
-.messages .message .m_remove{
-  margin: 0px;
-}
+
 .messages .message .text_wrapper .text {
   display: inline-block;
-  font-size: 18px;
-  font-weight: 300;
+  font-size: 17px;
+  font-weight: 400;
   word-break: break-all;
 }
 
