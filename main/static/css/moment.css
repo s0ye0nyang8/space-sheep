@@ -1,0 +1,113 @@
+@font-face { 
+    font-family: "Aldrich";
+    src: url("../font/Aldrich-Regular.ttf") format("truetype");
+    font-weight: normal;
+}
+  
+body {
+    margin: 0;
+    font-family:'Aldrich',"Calibri", "Roboto", sans-serif;
+    background-color: black;
+
+}
+
+.container-fluid{
+    height: 90px;
+}
+
+.container-fluid img{
+    width: 100px;    
+}
+.container-fluid i{
+    color: #7DFF68;
+}
+
+.container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin: auto;
+    height: 100%;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    overflow: hidden;
+}
+
+.gallery {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 30px;
+    grid-auto-flow: row dense;
+    overflow-y: scroll;
+
+}
+/* width */
+::-webkit-scrollbar{
+  width: 7px;
+  padding-left: 2px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+box-shadow: inset 0 0 5px white;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+background: #7DFF68;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+background: #7DFF68; 
+}
+
+.images{
+  width: 100%;
+  background-color: transparent;
+  height: fit-content;
+}
+
+@media screen and (max-width: 500px) {
+    .gallery {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        grid-auto-flow: row dense;
+    }
+    .images img{
+        width: 100%;
+        margin: 6px 0;
+    }
+}
+
+.text_wrapper {
+    display: inline-block;
+    border:solid;
+    border-color: #7DFF68;
+    border-radius: 5px;
+    border-width: 1px;
+    padding: 6px 6px;
+    max-width: 200px;
+    min-width: 10px;
+    position: relative;
+}
+
+.text_wrapper .text {
+    display: inline-block;
+    font-size: 18px;
+    font-weight: 300;
+    color: white;
+    word-break: break-all;
+}
+  
+.text_wrapper .m_imagediv img {
+    padding: 0px;
+    border-radius: 6px;
+    max-width: 100%;
+    height: auto;
+}
+  

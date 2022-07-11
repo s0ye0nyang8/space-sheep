@@ -1,0 +1,66 @@
+<DOCTYPE HTML5>
+    <html>
+        {% load static %}
+        <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+            <link rel="stylesheet" href="{% static 'css/moment.css'%}">
+            <script src="https://kit.fontawesome.com/c46a5452cb.js" crossorigin="anonymous"></script>
+            
+        </head>
+        <body width="100%" height="100%">
+            <div class="container">
+                <nav class="container-fluid">
+                    <ul>
+                        <li><a href="/ask/{{room_name}}">
+                            <i class="fa fa-arrow-left" aria-hidden="true"></i></a>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li><a href="/" class="contrast">
+                            <img src="{% static 'images/SPACESHEEP_logo_2.png' %}"></a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="gallery">
+                    {% for m in messages %}
+                        {% if m.content.media is None %}
+                        <div class="text_wrapper">
+                            <div class="m_imagediv"></div>
+                            <div class="text">{{m.content.text}}</div>
+                        </div>
+                        {% else %}
+                            <div class="images"> 
+                                <img src="{{m.content.media}}">
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    <!-- </div> -->
+                </div>
+            </div>
+        </body>
+    </html>
+<script src="https://code.jquery.com/jquery-latest.js"></script>
+<script type="text/javascript">
+    // var images = "{{images|escapejs}}";
+    
+    // let scaledImg = new Image();
+    // let imageLink = document.createElement("a");
+    // console.log(images);
+
+    // for(i=0;i<images.length;i++){
+    //     var item = images[i]
+    //     console.log(item);
+    //     imageLink.setAttribute("href", item.content);
+    //     imageLink.setAttribute('download', `${this.mid}.webp`);
+
+    //     scaledImg.onload = function () {
+    //         imageLink.appendChild(scaledImg);
+    //         $('.images').appendChild(imageLink);
+    //     };
+
+    //     scaledImg.setAttribute("src", item.content);
+    // }
+    
+</script>  

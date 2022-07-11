@@ -1,58 +1,218 @@
 <DOCTYPE HTML5>
+{% load static %}
 <html>
-    {% load static %}
     <head>
-        <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8" />
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:site" content="spacesheep.co.kr">
+        <meta name="twitter:title" content="SPACE-SHEEP">
+        <meta name="twitter:description" content="스페이스 채팅에 초대합니다.">
+        <meta name="twitter:image" content="{% static 'images/logo.png'%}">
+        <meta property="og:title" content="spacesheep">
+        <meta property="og:image" content="{% static 'images/logo.png'%}">
+        <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
         <link rel="stylesheet" href="{% static 'css/home.css'%}">
-        <meta property="og:image" content="{% static 'images/대문.png'%}">
-        <title>main home</title>
+        
     </head>
     <body width="100%" height="100%">
-        <div class="bg-image">
-            <div class="home-menu">
-                <a href="ask/{{room_name}}">
-                    <div class="gradient-text">
-                        {{nickname}}, 안녕하세요!        
-                        <p class="sub">입장하려면 클릭</p>
-                    </div>
-                </a>
-                <div class="btn_container home-btn" id="toggle">   <!-- 버튼 만들기 위한 큰 틀  버튼 활성화를 위한 토글 -->
-                    프로필 꾸미기🐏
+        {% if messages %}
+            {% for message in messages %}
+            {% if message.tags %}  <script>alert("{{ message }}")</script> {% endif %}
+            {% endfor %}
+        {% endif %}
+        <aside>
+            <nav class="main">
+                <div class="greeting">
+                    {% if user %}  
+                    <li class="rightword">
+                        Nice to see you again
+                    </li>
+                    {% else %}
+                    <li class="rightword">
+                        spacesheep
+                    </li>
+                    {% endif %}
                 </div>
-                <div class="overlay" id="overlay">
-                    <nav class="overlay-menu">
-                        <ul>
-                            <li>정보 수정</li>
-                            <form id="update-form" method="post" enctype="multipart/form-data" role="form" style="display: block;">
-                                {% csrf_token %}
-                                <li> 
-                                    <input class="user-info" name="nickname" placeholder="닉네임 설정">
-                                    <!-- <input class="romm-info" type="file" accept="img/*" name="bg-file" placeholder="채팅방 배경"> -->
-                                </li>
-                                
-                                <li>
-                                    <input type="submit" value="확인">
-                                </li>
-                            </form>
-                        </ul>
-                    </nav>
+                <div class="menu">
+                    <ul>
+                        {% if user %}
+                        <div class="settings">
+                            <li><a class="gradient-text"
+                                data-target="setting"
+                                onClick="toggleModal(event)">
+                                setting </a></li>
+                            <dialog class="option" id="setting">
+                                <article>
+                                    <form id="update-form" action="./settings" method="post" enctype="multipart/form-data" role="form" style="display: block;">
+                                        {% csrf_token %}
+                                        <a aria-label="Close"
+                                        class="close"
+                                        data-target="setting"
+                                        onClick="toggleModal(event)">
+                                        </a>
+                                        <fieldset>
+                                            <label for="Memeber Only Mode">
+                                                {% if rinfo.islocked == "on" %}
+                                                <input type="checkbox" id="switch" name="memberonly" role="switch" checked>
+                                                {% else %}
+                                                <input type="checkbox" id="switch" name="memberonly" role="switch" checked>
+                                                {% endif %}
+                                                member only
+                                            </label>
+                                        </fieldset>
+                                        <fieldset>
+                                            <label for="title">
+                                                <input type="text" id="rname" name="rname" value="{{rinfo.rname}}">
+                                            </label>
+                                            <label for="file">file browser
+                                                <input type="file" accept=".gif, .jpg, .png" id="bg-file" name="bg-file">
+                                            </label>
+                                        </fieldset>
+                                        <footer>
+                                        <button type="submit">
+                                            Confirm
+                                        </button>
+                                        </footer>
+                                    </form>
+                                </article>
+                            </dialog> 
+                        </div>
+                        <li>
+                            <a class="gradient-text" href='./signout' value='로그아웃'>sign out</a>
+                        </li>
+                        {% else %}
+                        <li>
+                            <a class="gradient-text" href='./signin' value='로그인'>sign in</a>
+                        </li>
+                        {% endif %}
+                        {% if user %}  
+                        <li><a class="gradient-text" href='./ask/{{user.room}}'>my spacesheep</a></li>
+                        {% else %}
+                        <li><a class="gradient-text" href='./signup'>create account</a></li>
+                        {% endif %}
+                        {% if user %} 
+                        <li><a class="gradient-text"
+                            data-target="modal-deregister"
+                            onClick="toggleModal(event)">탈퇴하기</a>
+                        </li>
+                        {% endif %}
+                        <form id="deregister-form" action="./deregister" method="post" enctype="multipart/form-data" role="form" style="display: block;">
+                            {% csrf_token %}
+                            <dialog id="modal-deregister">
+                                <article>
+                                    <a aria-label="Close"
+                                    class="close"
+                                    data-target="modal-deregister"
+                                    onClick="toggleModal(event)">
+                                    </a>
+                                    <h3>계정 삭제하기</h3>
+                                    <label for="firstname">
+                                    계정 정보 다시 입력
+                                    <input type="text" id="confirm-email" name="email" placeholder="email" required>
+                                    <input type="text" id="confirm-password" name="password" placeholder="password" required>
+                                    </label>
+                                    <footer>
+                                        <button type="submit">
+                                            Confirm
+                                        </button>
+                                    </footer>
+                                </article>
+                            </dialog>
+                        </form>
+                    </ul>
                 </div>
-                <div class="home-btn" onclick="location.href='/../logout'">
-                    로그아웃🐏
-                </div>
-                <p>Contact</p>
-                <p>yang82soyeon@gmail.com</p>
-            </div>           
-        </div>
-        
+            </nav>
+        </aside>
     </body>
 </html>
 <script src="https://code.jquery.com/jquery-latest.js"></script> 
 <script>
-        $("#toggle").click(function() {
-        $(this).toggleClass("active");
-        $('#overlay').toggleClass('open');
-        // $(".fullscreen").slideToggle();
+    const isOpenClass = 'modal-is-open';
+    const openingClass = 'modal-is-opening';
+    const closingClass = 'modal-is-closing';
+    const animationDuration = 400; // ms
+    let visibleModal = null;
+
+
+    // Toggle modal
+    const toggleModal = event => {
+        event.preventDefault();
+        const modal = document.getElementById(event.currentTarget.getAttribute('data-target'));
+        (typeof(modal) != 'undefined' && modal != null)
+            && isModalOpen(modal) ? closeModal(modal) : openModal(modal)
+    }
+
+    // Is modal open
+    const isModalOpen = modal => {
+        return modal.hasAttribute('open') && modal.getAttribute('open') != 'false' ? true : false;
+    }
+
+    // Open modal
+    const openModal = modal => {
+    if (isScrollbarVisible()) {
+        document.documentElement.style.setProperty('--scrollbar-width', `${getScrollbarWidth()}px`);
+    }
+    document.documentElement.classList.add(isOpenClass, openingClass);
+    setTimeout(() => {
+        visibleModal = modal;
+        document.documentElement.classList.remove(openingClass);
+    }, animationDuration);
+    modal.setAttribute('open', true);
+    }
+
+    // Close modal
+    const closeModal = modal => {
+    visibleModal = null;
+    document.documentElement.classList.add(closingClass);
+    setTimeout(() => {
+        document.documentElement.classList.remove(closingClass, isOpenClass);
+        document.documentElement.style.removeProperty('--scrollbar-width');
+        modal.removeAttribute('open');
+    }, animationDuration);
+    }
+
+    // Close with a click outside
+    document.addEventListener('click', event => {
+    if (visibleModal != null) {
+        const modalContent = visibleModal.querySelector('article');
+        const isClickInside = modalContent.contains(event.target);
+        !isClickInside && closeModal(visibleModal);
+    }
     });
+
+    // Close with Esc key
+    document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && visibleModal != null) {
+        closeModal(visibleModal);
+    }
+    });
+
+    // Get scrollbar width
+    const getScrollbarWidth = () => {
+
+    // Creating invisible container
+    const outer = document.createElement('div');
+    outer.style.visibility = 'hidden';
+    outer.style.overflow = 'scroll'; // forcing scrollbar to appear
+    outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
+    document.body.appendChild(outer);
+
+    // Creating inner element and placing it in the container
+    const inner = document.createElement('div');
+    outer.appendChild(inner);
+
+    // Calculating difference between container's full width and the child width
+    const scrollbarWidth = (outer.offsetWidth - inner.offsetWidth);
+
+    // Removing temporary elements from the DOM
+    outer.parentNode.removeChild(outer);
+
+    return scrollbarWidth;
+    }
+
+    // Is scrollbar visible
+    const isScrollbarVisible = () => {
+    return document.body.scrollHeight > screen.height;
+    }
 </script>

@@ -1,57 +1,58 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from ..cache import CacheUser
+
 from django.utils.safestring import mark_safe
+from django.contrib import messages
 import json
 from django.http import Http404
-from urllib import parse
-# for s3 presigned URL
-import logging
-import boto3
 
-from ..dynamodbchat import uploadImageS3
+from ..dynamodbchat import get_latest_messages2
 from ..dynamodbauth import getRoominfo, updateRoomInfo
 from botocore.exceptions import ClientError
 import uuid
-from ipware import get_client_ip
 
 
 def ask(request,room_name):
-    user_id = request.session.get('user') 
-    myroom = CacheUser(user_id).getCachedRoom()
-    # roominfo= {}
-    # thisroom = CacheRoom(room_name)
-    client_ip, is_routable = get_client_ip(request)
-    print(client_ip,"entered room")
+    uinfo = request.session.get('uinfo') 
+    thisroom = getRoominfo(room=room_name)
+    print(uinfo)
+    print(thisroom)
     if request.method == 'GET':
-        # name = thisroom.getName()
-        roominfo = getRoominfo(room_name)
-        return render(request, 'main/ask.html', {
-            'room_name':room_name,
-            'name':roominfo['rname'],
-            'user': myroom,
-        })
+        try:
+            if thisroom['islocked']=='on':
+                if uinfo is None:
+                    messages.error(request, '로그인해야 이용 가능한 채널입니다.')
+                    return redirect('home')
+                    
+                elif uinfo['room']==room_name:
+                    return render(request, 'main/ask.html', {
+                        'room_name':room_name,
+                        'name': thisroom['rname'],
+                        'user': uinfo['room'],
+                    })
+                else:
+                    if uinfo['room'] in thisroom['blocklist']:
+                        messages.error(request, '입장이 불가능한 채널입니다.')
+                        return redirect('home')
 
-    if request.method == 'POST':
-        name =None
-        bg=None
-        if myroom==room_name:
-            name = request.POST.get('rname')
-            # thisroom = CacheRoom(room_name)
-            if name is None:
-                name=getRoominfo(room_name)
-            # res = CacheRoom(room_name).updateCacheRoom(name)
-            res = updateRoomInfo(room_name,name)
-            try:
-                bg = request.FILES['bg-file']
-                res = uploadImageS3(bg,room_name)
-            except:
-                pass
-            
+            return render(request, 'main/ask.html', {
+                'room_name':room_name,
+                'name': thisroom['rname'],
+                'user': uinfo['room'],
+            })
+        except:
+            print("exception occured!")
             return render(request, 'main/ask.html', {
                     'room_name':room_name,
-                    'name':name,
-                    'user': myroom,
+                    'name': thisroom['rname'],
+                    'user': None,
                 })
-        else:
-            pass
-            
+
+    if request.method == 'POST':
+        raise Http404("올바른 접근이 아닙니다.")
+
+    
+def moment(request, room_name):
+    messages = get_latest_messages2(room_name)
+    # latestkey = getCachedLatestKey(room=room_name)
+    # images = get_cached_data(room=room_name, startkey=latestkey)
+    return render(request, 'main/moment.html', {"room_name":room_name,"messages":messages} )

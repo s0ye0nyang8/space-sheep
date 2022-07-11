@@ -5,7 +5,7 @@ from datetime import datetime
 from django.conf import settings
 from .cache import *
 from .dynamodbchat import *
-from .batch_write_task import writetoDB
+from .batch_write_task import writetoDB, batch_write
 import time, json
 import base64, random
 import requests 
@@ -17,16 +17,21 @@ class AskConsumer(AsyncWebsocketConsumer):
     blocklist = []
 
     async def new_message(self,data):
-        mid = '_'.join([self.room_name,data['timestamp']])
         url = None
-        # message caching 
-        if data['media'] is not None:
-            url = await get_presigned_url(method='get_object',filename=data['media'])
-
+        # message caching --> removed temporarily
+        try:
+            if data['media'] is not None:
+                print("there is media url")
+                url = await get_presigned_url(method='get_object',filename=data['media'])
+                # latestkey = getCachedLatestKey(room=self.room_name)
+                # CacheMessage(mid=mid,nextkey=latestkey,content=url).cacheMessage()
+                # setLatestKey(room=self.room_name, mid=mid)
+        except:
+            pass
+        
         message = {
-            'owner':data['room'],
-            'mid':mid, # 수정된 값
-            # dynamodb에 그대로 저장될 값 == content
+            'owner':self.room_name,
+            'mid': '_'.join([self.room_name,data['timestamp']]),
             'content':{
                 'user':data['user'],
                 'text':data['text'],
@@ -34,11 +39,10 @@ class AskConsumer(AsyncWebsocketConsumer):
             },
             'timestamp':int(data['timestamp']),
         }
-        writetoDB(user=data['room'],items=message)
+        await writetoDB(user=self.room_name,db='messages-1',items=message)
+         
         # latestkey = await getCachedLatestKey(room=self.room_name)
         # CacheMessage(mid=mid,nextkey=latestkey,content=message).cacheMessage()
-
-
         # setLatestKey(room=self.room_name,mid=mid)
 
         await self.channel_layer.group_send(
@@ -50,7 +54,7 @@ class AskConsumer(AsyncWebsocketConsumer):
         )
 
     async def delete_message(self,data):
-        response = delete_DBmessage(data)
+        response = delete_DBmessage(db='messages-1',data=data)
         mid = data['mid']
         if response['ResponseMetadata']['HTTPStatusCode']==200:
             # CacheMessage(mid).deleteMessage()
@@ -81,53 +85,60 @@ class AskConsumer(AsyncWebsocketConsumer):
     async def fetch_message(self,data):
         top_message = data['top_message']
         if top_message is not None:
-            messages = await get_latest_messages(room=self.room_name,ExclusiveStartKey=top_message)
-            # messages = await get_cached_data(room=self.room_name, startkey=top_message)
-            if messages:
-                del messages[0]
+            messages = await get_latest_messages(room=self.room_name,db='messages-1',ExclusiveStartKey=top_message)
+            # if messages:
+            #     del messages[0]
         else:
-            messages = await get_latest_messages(room=self.room_name)
+            messages = await get_latest_messages(room=self.room_name,db='messages-1')
             # latest_mid = await getCachedLatestKey(self.room_name)
             # messages = await get_cached_data(room=self.room_name, startkey=latest_mid)
         
-        # print(len(messages))
         await self.send(text_data=json.dumps({
             "command":"fetch_message",
             "message": messages,
             "top_message":top_message,
         },))
 
+    async def keep_message(self,data):
+        print('this is kept message')
+        owner,timestamp=data['mid'].split('_')
+        message = await getMessage(owner,'messages-1',timestamp)
+        print(message)
+        await writetoDB(user=self.room_name,db='message-2',items=message)
+
+    
+    async def block(self,data):
+        print('user blocked')
+        rinfo = getRoominfo(self.room_name)
+        rinfo['blocklist'].append(data['user'])
+        updateRoomInfo(self.room_name,rinfo)
+    
     commands = {
         'fetch_message':fetch_message,
         'new_message':new_message,
         'delete_message':delete_message,
-        'presigned_url':presigned_url
+        'presigned_url':presigned_url,
+        'addMoment':keep_message,
+        'blockUser': block
     }
 
     async def connect(self):
-        # print("connecting...")
         self.room_name = self.scope["url_route"]['kwargs']["room_name"]
         self.room_group_name = 'chat_%s' % self.room_name
-        # print(self.room_group_name)
-        print(self.channel_name)
+        # print("channel name",self.channel_name)
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
     async def disconnect(self,close_code):
-        # print("disconnecting...")
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
     
-    # Receive message from WebSocket
     async def receive(self, text_data): 
         data = json.loads(text_data)
         await self.commands[data['command']](self,data['message'])
         
-
-    # Receive message from room group
     async def chat_message(self, event):
         message = event['message']
         command = event['command']
-        # print("group recieved :", message)
         await self.send(text_data=json.dumps({
             'command':command,
             'message': message,

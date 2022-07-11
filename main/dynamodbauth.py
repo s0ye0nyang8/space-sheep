@@ -18,21 +18,24 @@ def updateUserInfo(request,email,name,desc):
         return response
     except ClientError as e:
         print(e)
-        # raise Http404("User does not exist")
+        raise Http404("User does not exist")
 
-def updateRoomInfo(roomid,name):
+def updateRoomInfo(roomid,rinfo):
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table('room')
+    print(rinfo)
     try:
         response = table.update_item(
             Key={'roomid': roomid},
-            UpdateExpression="SET roominfo.rname=:n" ,
-            ExpressionAttributeValues= {':n': name}
+            UpdateExpression="SET roominfo.rname=:n, roominfo.islocked=:op, roominfo.blocklist=:bl",
+            ExpressionAttributeValues= {':n': rinfo['rname'], ':op': rinfo['islocked'], ':bl':rinfo['blocklist']}
         )
         return response
 
     except ClientError as e:
         print(e)
+        raise Http404("channel does not exist")
+
 
 
 def myauthenticate(request,email,password):
@@ -42,7 +45,6 @@ def myauthenticate(request,email,password):
         response = table.get_item(
             Key={'email': email}
         )
-        # print(response)
         if 'Item' in response.keys():
             encoded_pass = hashlib.sha256(str(password).encode('utf-8')).hexdigest()
             if encoded_pass == response['Item']['password']:
@@ -50,15 +52,15 @@ def myauthenticate(request,email,password):
                 request.session['user']=email
                 return response['Item']['userinfo']
 
-        messages.add_message(request,messages.ERROR,"id or password not correct")
+        messages.add_message(request,messages.ERROR,"계정 정보가 일치하지 않습니다.")
         return None
         
     except ClientError as e:
-        messages.add_message(request,messages.ERROR,"id or password not correct")
+        messages.add_message(request,messages.ERROR,"계정 정보가 일치하지 않습니다.")
         return None
 
         
-def createUser(request,email,password):
+def createUser(email,password):
     enc = hashlib.sha256(str(password).encode('utf-8')).hexdigest()
     
     try:
@@ -86,37 +88,35 @@ def createUser(request,email,password):
                 "roomid":room,
                 "roominfo":{
                     'rname':name+'의 spacesheep',
+                    'islocked':'off',
+                    'blocklist':[],
                 }
             },
-            ConditionExpression= 'attribute_not_exists(room)'
+            ConditionExpression= 'attribute_not_exists(roomid)'
         )
         return room
 
     except ClientError as e:
-        if e.response['Error']['Code'] == "ConditionalCheckFailedException":
-            messages.error(request, '이미 존재하는 아이디입니다.') 
-            return False
+        return False
     
-def removeUser(request,email,password):
-    try:
-        dynamodb = boto3.resource('dynamodb')
-        userinfo = dynamodb.Table("userinfo")
-        response = userinfo.delete_item(
-            Key={
-                'email': email,
-            },
-            ConditionExpression="password == :val",
-            ExpressionAttributeValues={
-                ":val": hashlib.sha256(str(password).encode('utf-8')).hexdigest()
-            }
-        )
-    except ClientError as e:
-        if e.response['Error']['Code'] == "ConditionalCheckFailedException":
-            print(e.response['Error']['Message'],"이메일 또는 비밀번호가 일치하지 않음")
-        else:
-            raise
-    else:
-        return response
+def removeUser(request,email,room,password):
+    dynamodb = boto3.resource('dynamodb')
+    userinfo = dynamodb.Table("user")
+    response = userinfo.delete_item(
+        Key={
+            'email': email,
+        },
+        ConditionExpression="attribute_exists(email)"
+    )
+    dynamodb = boto3.resource('dynamodb')
+    userinfo = dynamodb.Table("room")
+    response = userinfo.delete_item(
+        Key={
+            'roomid': room,
+        },
+        ConditionExpression="attribute_exists(roomid)"
+    )
+    print(response)
 
 def getUserinfo(email):
     try:
@@ -147,6 +147,4 @@ def getRoominfo(room):
         
     except ClientError as e:
         print(e)
-
-
 

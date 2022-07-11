@@ -14,22 +14,23 @@
         <link rel="stylesheet" href="{% static 'css/login.css'%}">
         <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
         
-      </head>
+    </head>
       <body width="100%" height="100%">
-        <form id="login-form" action="../signin" method="post" role="form">
+        <form id="register-form" action="../signup" method="post" role="form">
             <main class="main">
                 <article>
                     <nav class="header-nav">
                         <ul>
-                            <h2>Sign In</h2>
+                            <h2>Register</h2>
                         </ul>
                     </nav>
-                    <section>    
+                    <section>
                         {% csrf_token %}
-                        <div class="grid">
-                            <input type="email" name="userid" id="email" placeholder="Email Address" required>
-                            <input type="password" name="userpw" id="password" placeholder="Password" required>
-                        </div>
+                        <label for="email">
+                            <input type="email" name="userid" id="email" placeholder="Email Address">
+                        </label>
+                        <input type="password" name="password1" id="password" placeholder="Password">
+                        <input type="password" name="password2" id="confirm-password" placeholder="Confirm Password">
                         {% if messages %}
                             {% for message in messages %}
                                 <div class="col-1 {{message.tags}}">
@@ -37,13 +38,20 @@
                                 </div>
                             {% endfor %}
                         {% endif %}
+                        <label for="terms">
+                            <p>온라인 범죄 예방 목적을 위한 정보 수집(채팅방 내 텍스트, 미디어)에 동의합니다.</p>
+                            <input type="checkbox" role="switch" id="terms" name="terms" required>
+                        </label>
                         <footer>
-                            <button type="submit" class="outline">Submit</button>
-                            <!-- <button type="submit" class="outline">Find Password</button> -->
-                        </footer>
+                            <button type="submit" action="../signup" id="login-submit" class="outline">create account</button>
+                            {% load socialaccount %}
+                            {% providers_media_js %}
+                            {% csrf_token %}
+                            <a href="{% provider_login_url 'google' %}">Google 로그인</a><br>
+                        </footer>  
                     </section>
                 </article>
             </main>
         </form>
-    </body>
-</html>
+      </body>
+	</html>

@@ -2,15 +2,15 @@
 
 # import os
 
-# import boto3
 # from celery import Celery
 # from django.conf import settings
 # from celery import shared_task
+# from batch_write_task import batch_write
 # #'셀러리' 프로그램을 위해 기본 장고 설정파일을 설정합니다.
 # os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chattingapp.settings')
 
 # app = Celery('chattingapp')
-# app.config_from_object('django.conf:settings', namespace='CELERY')
+# app.config_from_object('django.conf:settings')
 
 # #등록된 장고 앱 설정에서 task를 불러옵니다.
 # app.autodiscover_tasks()

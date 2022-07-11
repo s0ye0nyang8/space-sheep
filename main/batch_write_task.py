@@ -6,17 +6,15 @@ from django.core.cache import cache
 import asyncio
 import os
 
-def batch_write():
-    alluser = getAllUser()
-    
+async def batch_write():
+    alluser = await getAllUser()
     if alluser:    
-        for user in alluser:
+        for user in alluser[:100]:
             room = user['userinfo']['room']
-            items=collectCache(user)
-            writetoDB(room,items)
+            items = await collectCache(user)
+            await bwritetoDB(room,items)
     
-
-def getAllUser():
+async def getAllUser():
     dynamodb = boto3.resource('dynamodb')
     try:
         table = dynamodb.Table('user')
@@ -32,7 +30,7 @@ def getAllUser():
     except ClientError as e:
         print(e)
 
-def collectCache(room):
+async def collectCache(room):
     _next = cache.get('%s:latest'%room)
     items =[]
     cnt = 0
@@ -46,16 +44,35 @@ def collectCache(room):
             break            
     return items
 
-def writetoDB(user,items):
+# async def writetoSecondDB(user,items):
+    
+#     dynamodb = boto3.resource('dynamodb')
+#     table = dynamodb.Table('messages-2')
+#     try:
+#         response = table.put_item(Item=items)
+#     except Exception as e:
+#         print(f'{user}      : write failed: {e}')
+
+
+async def writetoDB(user,db,items):
     
     dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('messages-1')
+    table = dynamodb.Table(db)
     try:
         response = table.put_item(Item=items)
-        # for item in items:
-        #     dynamodb.batch_write_item(RequestItems={
-        #         'messages-1': [{ 'PutRequest': { 'Item': [item] }}]
-        #     })
+    except Exception as e:
+        print(f'{user}      : write failed: {e}')
+
+
+async def bwritetoDB(user,db,items):  
+    print(items)
+    
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(db)
+    try:
+        for i in items:
+            response = await table.put_item(Item=i)
+        
         print(f'{user}     : write succeeded.')
     except Exception as e:
         print(f'{user}      : write failed: {e}')

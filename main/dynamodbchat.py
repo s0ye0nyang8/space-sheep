@@ -5,14 +5,15 @@ import boto3
 from django.http import Http404   
 import base64
 
-def delete_DBmessage(data):
+def delete_DBmessage(db,data):
     dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('messages-1')
-    # mid = data['mid'].split('_')
+    table = dynamodb.Table(db)
+    mid = data['mid'].split('_')
     try:
         response = table.delete_item(
             Key={
-                'mid':mid,
+                'owner':mid[0],
+                'timestamp':int(mid[1]),
             },
         )
         return response
@@ -20,9 +21,9 @@ def delete_DBmessage(data):
         print(e)
     
 
-async def get_latest_messages(room,ExclusiveStartKey=None):
+async def get_latest_messages(room,db,ExclusiveStartKey=None):
     dynamodb = boto3.resource('dynamodb')
-    table = dynamodb.Table('messages-1')
+    table = dynamodb.Table(db)
     # option = ExclusiveStartKey=ExclusiveStartKey
     try:
         if ExclusiveStartKey is not None:
@@ -47,6 +48,20 @@ async def get_latest_messages(room,ExclusiveStartKey=None):
     except ClientError as e:
         print(e)
     
+def get_latest_messages2(room):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table('message-2')
+    try:
+        response = table.query(
+            KeyConditionExpression=Key('owner').eq(room),
+            Limit=50,
+            ScanIndexForward=False,
+            ConsistentRead=True,
+        )
+        return response['Items']
+
+    except ClientError as e:
+        print(e)
 
 async def get_presigned_url(method,filename):
     url = await create_presigned_post(method=method,bucket_name='test-boo', object_name=filename)
@@ -64,7 +79,6 @@ async def create_presigned_post(method, bucket_name, object_name):
             ExpiresIn=7*24*600)
         # encoded = base64.urlsafe_b64encode(bytes(url, 'UTF-8')).decode("UTF-8")#.rstrip("=")
         # print("encoded url:",encoded)
-        
         return url
         # String policyEnc = EncodingUtil.base64Encode(Blob.valueOf(strpolicy));
         # policyEnc = policyEnc.replace('+','-').replace('=','_').replace('/','~');
@@ -85,13 +99,18 @@ def uploadImageS3(file,owner):
     except ClientError as e:
         print(e)
 
-# def getImageS3(filename):
-#     try:
-#         response = boto3.client('s3').get_object(
-#             Bucket='sheep-1',
-#             Key=filename
-#         )
-#         return response['Body']
-#     except ClientError as e:
-#         print(e)
-#         return None 
+async def getMessage(room,db,timestamp):
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(db)
+    try:
+        response = table.query(
+            KeyConditionExpression=Key('owner').eq(room)&Key('timestamp').eq(int(timestamp)), 
+            Limit=10,
+            ScanIndexForward=False,
+            ConsistentRead=True
+        )
+        return response['Items'][0]
+    except ClientError as e:
+        print(e)
+        return None 
+ 

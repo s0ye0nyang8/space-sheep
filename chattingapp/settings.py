@@ -15,6 +15,7 @@ import os
 # from celery import Celery
 
 from decouple import config
+# from django.urls import reverse_lazy
 
 # from celery.schedules import crontab
 
@@ -34,9 +35,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-LOGIN_REDIRECT_URL = "/home"
-LOGOUT_REDIRECT_URL = "/"
-LOGIN_URL = "/"
+LOGIN_URL = "/signin"
+LOGIN_REDIRECT_URL = "/" # 로그인 후 리디렉션할 페이지
+ACCOUNT_LOGOUT_REDIRECT_URL = "/"  # 로그아웃 후 리디렉션 할 페이지
+ACCOUNT_LOGOUT_ON_GET = True # 로그아웃 버튼 클릭 시 자동 로그아웃
+# LOGIN_URL = reverse_lazy('account_login')
+# LOGIN_REDIRECT_URL = reverse_lazy('account_profile')
 
 
 # Application definition
@@ -67,19 +71,7 @@ AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
 AWS_REGION = config('AWS_DEFAULT_REGION')
 AWS_QUERYSTRING_AUTH = False
 
-# CELERY_ALWAYS_EAGER = True
-# CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
-# CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
-
-# CELERY_ACCEPT_CONTENT = ['application/json']
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_TIMEZONE = 'Asia/Seoul'
-
-logfilepath = os.path.join(BASE_DIR,'cronjob.log')
-CRONJOBS = [
-    ('* * * * *', 'main.batch_writeDB.main', '>> %s'%logfilepath),
-]
+CRONTAB_DJANGO_SETTING_MODULE = 'chattingapp/settings'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -100,6 +92,7 @@ AUTHENTICATION_BACKENDS = (
     # `allauth` specific authentication methods, such as login by e-mail
     'allauth.account.auth_backends.AuthenticationBackend',
 )
+
 
 SITE_ID = 1
 
@@ -159,39 +152,8 @@ DATABASES = {
     }
 }
 
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'djongo',
-#         'ENFORCE_SCHEMA': True,
-#         'LOGGING': {
-#             'version': 1,
-#             'loggers': {
-#                 'djongo': {
-#                     'level': 'DEBUG',
-#                     'propogate': False,                        
-#                 }
-#             },
-#          },
-#         'NAME': 'spacesheep',
-#         'CLIENT': {
-#             'host': '127.0.0.1',
-#             'port': 27017,
-#             'username': os.environ.get('MONGO_USERNAME'),
-#             'password': os.environ.get('MONGO_PASSWORD'),
-#             'authSource': 'admin',
-#             'authMechanism': 'SCRAM-SHA-1'
-#         }
-#     }
-# }
 
 SESSIONS_ENGINE = 'django.contrib.sessions.backends.cache'
-SESSION_REDIS_HOST = 'localhost'
-SESSION_REDIS_PORT = 6379
-SESSION_REDIS_DB = 0
-
 
 CACHES = {  
     "default": {
@@ -202,9 +164,6 @@ CACHES = {
         }
     }
 }
-
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -252,3 +211,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIAFILES_DIRS = os.path.join(BASE_DIR,'media')
 
 MEDIA_URL = '/media/'
+
+IPWARE_META_PRECEDENCE_ORDER = (
+     'HTTP_X_FORWARDED_FOR', 'X_FORWARDED_FOR', 
+     'HTTP_CLIENT_IP',
+     'HTTP_X_REAL_IP',
+     'HTTP_X_FORWARDED',
+     'HTTP_X_CLUSTER_CLIENT_IP',
+     'HTTP_FORWARDED_FOR',
+     'HTTP_FORWARDED',
+     'HTTP_VIA',
+     'REMOTE_ADDR',
+)

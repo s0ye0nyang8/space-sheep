@@ -2,100 +2,75 @@
     <html>
       {% load static %}
       <head>
-        <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/c46a5452cb.js" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="{% static 'css/chat.css'%}">
+        <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:site" content="spacesheep.co.kr">
         <meta name="twitter:title" content="SPACE-SHEEP">
         <meta name="twitter:description" content="스페이스 채팅에 초대합니다.">
-        <meta name="twitter:image" content="https://sheep-1.s3.ap-northeast-2.amazonaws.com/sheep-n-ship.png">
+        <meta name="twitter:image" content="https://sheep-1.s3.ap-northeast-2.amazonaws.com/logo.png">
         <meta property="og:title" content="spacesheep">
-        <meta property="og:description" content="초대장 -🐏- ">
-        <meta property="og:image" content="{% static 'images/space-n-ship.png'%}">
-      </head>
+        <meta property="og:image" content="{% static 'images/logo.png'%}">
+        
+    </head>
       <body width="100%" height="100%">
-        <div class="popup" id='popup' name="notice">
-            <div class="content">
-                <h4>정보 수집 동의</h4>
-                <p><정보의 수집·이용 목적><br>
-                최근 아이돌 가수 합성 사진, 음란물을 유포하고 있는 대화방을 발견했습니다.
-                그래서 앞으로 모니터링 및 신고를 위해 메시지를 수집 및 열람할 수 있는 권한과, IP 수집에 관한 동의를 요청드리려 합니다.
-                </p>
-                <p><수집 항목><br>
-                    채팅메시지(텍스트, 이미지, gif 등 파일), 접속자의 IP 주소 (접속하기만 해도 수집됨)
-                </p>
-                <p><개인정보의 보유 및 이용 기간><br>
-                    ~ 2022년 12월 31일 까지
-                </p>
-                <p>기존 이용자는 동의를 거부할 권리가 있으며, 그런 경우
-                    스페이스쉽 개발자 채널에서 "아이디와 함께" 탈퇴 및 정보 삭제를 요청해주시기 바랍니다. (메일X)<br>
-                    스페이스쉽이 동네 약수터 같은 작고 평화로운 서비스가 될 수 있도록 노력하겠습니다.
-                </p>
-                <p>감사합니다.</p>
-            </div>
-            <div class="cmd">
-                <a type="button" id="accept" class="close-btn">동의하기</a>
-                <a href='https://spacesheep.co.kr/home/ask/3d3c4fc9-8f21-4164-bb25-8554a300f104' type="button" id="refuse" class="close-btn">탈퇴 신청하러 가기</a>
-            </div>
-        </div>
-        <div class="chat_window" id="mybackground">
-            <a id="t-button" class="show"></a>
-            <div class="top_menu"> 
-                <div class="title">
-                    <h1>{{name}}</h1>
-                    {% if user == room_name %}
-                    <div class="menu-btn">
-                        <div class="btn_container" id="toggle">   <!-- 버튼 만들기 위한 큰 틀  버튼 활성화를 위한 토글 -->
-                            <span class="top"></span>         <!-- 햄버거의 맨 위 막대기 -->
-                            <span class="middle"></span>    <!-- 햄버거의 가운데 막대기 -->
-                            <span class="bottom"></span>    <!-- 햄버거의 맨 아래 막대기 -->
-                        </div>
-                        <div class="overlay" id="overlay">
-                            <nav class="overlay-menu">
-                                <ul>
-                                    <h2>스쉽꾸미기</h2>
-                                    <form id="update-form" method="post" enctype="multipart/form-data" role="form" style="display: block;">
-                                        {% csrf_token %}
-                                        <li> 
-                                            채팅방 이름
-                                            <input class="room-info" id ="rname" name="rname">
-                                        </li>
-                                        <li>
-                                            채팅방 배경
-                                            <input class="room-info" id="bg-file" type="file" accept="img/*" name="bg-file">
-                                        </li>
-                                        <input id="user-setting" type="submit" value="확인">
-                                        <!-- <input id="horang" type="submit" value="🐯"> -->
-                                    </form>
-                                </ul>
-                            </nav>
-                        </div>
-                    </div>
-                    {% endif %}
+        <!-- <dialog id="notice" >
+            <article>
+              <h3>Confirm your action!</h3>
+              <p>
+                Mauris non nibh vel nisi sollicitudin malesuada. 
+                Donec ut sagittis erat. Praesent eu eros felis. 
+                Ut consectetur placerat pulvinar.
+              </p>
+              <footer>
+                <div class="cmd">
+                    <a role="button" id="accept" class="close-btn" onClick="toggleModal(event);PopupNoDisplay();" data-target="notice">오늘 하루 보지 않기</a>
                 </div>
-            </div>
-            <!-- <div class="msg-area"> -->
+              </footer>
+            </article>
+        </dialog> -->
+        <div class="chat_window" id="mybackground">
+            <i id="t-button" class="fa-solid fa-angles-up"></i>
+            <i id="autoscroll-button" class="fa-solid fa-lock-open"></i>
+            <nav class="top_menu">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                </ul>
+                <ul>
+                    <li><h1 style="font-size: large;">{{name}}</h1></li>
+                </ul>
+                <ul>
+                    <li><a href="/ask/{{room_name}}/moment">
+                        <i class="fa-solid fa-images"></i>
+                    </a></li>
+                </ul>
+            </nav>
             <ul class="messages"></ul>
-            <!-- </div> -->
             <div class="bottom_wrapper clearfix">
                 <div style="display: none;" class="preview">
                     <div class="previewdiv"></div>
                     <button class="delete_photo">
-                        <i class="glyphicon glyphicon-remove" ></i>
+                        <!-- <i class="glyphicon glyphicon-remove" ></i> -->
+                        <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
-                <div class="chat-footer">
+                <nav class="container-fluid chat-footer">
                     <textarea class="message_input" maxlength="100" ></textarea>
-                    <label class="upload_photo">
-                        <form id="myform" hidden>
-                            <input id="myfile" type="file" accept="img/*" hidden/>
-                        </form>
-                        <i class="fa fa-paperclip"></i>
-                    </label>
-                    <button type="button" class="send-message-button btn-info"> <i class="fa fa-send"></i>
-                </div>
+                    <ul class="grid">
+                        <label role="button" class="upload_photo">
+                            <form id="myform" hidden>
+                                <input id="myfile" type="file" accept="img/*" hidden/>
+                            </form>
+                            <i class="fa fa-camera"></i>
+                        </label>
+                        
+                        <button class="send-message-button">
+                            <i class="fa fa-paper-plane"></i>
+                        </button>
+                    </ul>
+                </nav>
             </div>
         </div>
         <div class="message_template">
@@ -106,25 +81,36 @@
                 </div>
                 {% if user == room_name %}
                 <button class="m_remove">
-                    <i class="glyphicon glyphicon-remove" ></i>
+                    <i class="fa fa-remove"></i>
                 </button>
                 {% endif %}
+            </li>
+        </div>
+        <div id="context-menu" class="context-menu">
+            <li role="list" class="items">
+              <li class="option">
+                <a href="#" class="option-link" id="save-msg" data-action="addMoment">모먼트에 추가</a>
+              </li>
+              {% if user == room_name %}
+              <li class="option">
+                <a href="#" class="option-link" id="block-user" data-action="blockUser">블락</a>
+              </li>
+              {% endif %}
             </li>
         </div>
       </body>
     </html>
 
-<script src="https://code.jquery.com/jquery-latest.js"></script> 
+<script src="https://code.jquery.com/jquery-latest.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <script src="https://rawgit.com/jackmoore/autosize/master/dist/autosize.min.js"></script> 
 <script src="https://unpkg.com/konva@8.3.0/konva.min.js"></script>
 <script src="https://unpkg.com/gifler@0.1.0/gifler.min.js"></script>
 <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1046.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-base64@3.7.2/base64.min.js"></script>
-
 <script type="text/javascript">
     var ROOMNAME = "{{room_name|escapejs}}";
     var USER = "{{user|escapejs}}";
-    var message_side = 'right';
     var MAX_WIDTH = 300;
     var MAX_HEIGHT = 300;
     var btncount = 1;
@@ -137,8 +123,34 @@
     $("#mybackground").css({"background":`url(${url})`}); 			
     $("#mybackground").css({"background-position": "center"});
     var chatSocket = new WebSocket(
-        'ws://'+ window.location.host + '/home/' + 'ask/' + ROOMNAME 
+        'ws://'+ window.location.host + '/ask/' + ROOMNAME 
     );
+    
+    function PopupNoDisplay() { 
+        $.cookie("popup", "done", { expires: 1 });
+        PopupHide(); 
+    }
+
+    function PopupBgDisplay() { 
+        cookiedata1 = document.cookie; 
+        if (cookiedata1.indexOf("popup=done") > 0) { 
+            $('.overlay').toggleClass('open');
+        }
+    }
+    function PopupHide() { //팝업창 지우기 
+        $('#popup').hide(); 
+        PopupBgDisplay();
+    }
+    $(document).ready(function () {
+        $('.popup').show(); 
+        cookiedata = document.cookie; 
+        if ( cookiedata.indexOf("popup=done") < 0 ){ //쿠키 변경 여부 불러오기 
+            document.all['popup'].style.visibility = "visible"; 
+        } else { 
+            document.all['popup'].style.display = "none"; 
+        } 
+        PopupBgDisplay(); 
+    });
 
     chatSocket.onopen = function(e) {
         chatSocket.send(JSON.stringify({
@@ -170,8 +182,6 @@
 
         var mid = message['mid']
         var message_box;
-        
-        var message_side = ROOMNAME === content['user'] ? 'left':'right';
         var url= null;
 
         if (content['media']==null) {
@@ -182,7 +192,7 @@
             mid: mid,
             image: content["media"],
             text: content['text'],
-            message_side: message_side,
+            user:content['user'],
         });
 
         if (top === null){
@@ -191,7 +201,7 @@
                 return message_box.addClass('appeared');
             }, 0);
         }
-        else{
+        else {
             // firstchild = $(`.messages #${top}`);
             $('.messages').prepend(message_box);
             // message_box.prependTo(firstchild);
@@ -200,11 +210,6 @@
             }, 0);  
         }
     }
-
-    $("ul.messages").on("click", "button[class='m_share']", function (e) {
-        $this_message = $(this).closest('li.message');
-        var text = $this_message.attr('text');
-    });
 
     chatSocket.onmessage = function(e) {
         var message = JSON.parse(e.data);
@@ -215,8 +220,7 @@
 
             var dec_url = content['url'];
             var fileName = content['fileName'];
-
-            promise = uploadUsingPresignedURL(url=dec_url,filename=fileName);
+            promise = uploadUsingPresignedURL(url=dec_url, filename=fileName);
             promise.then((req)=>{
                 sendMediaMessage(fileName);
             });
@@ -242,19 +246,10 @@
             scrollmessage();
         }
     };
-    var isPressed =false;
-    
-    $('messages').bind("touchmove",function(e){
-        isPressed=true;
-    })
-    
-    $('messages').bind('mousedown', function(e) {
-        isPressed = true;
-        doInterval('-1');
-    });
+    var autoscroll =true;
 
     function scrollmessage(){
-        if (isPressed==false){
+        if (autoscroll==true){
             $messages =$('.messages');
             $messages.animate({scrollTop: $messages.prop('scrollHeight')*2},0.3);
         }
@@ -264,13 +259,16 @@
     };
 
     function Message(arg) {
-        this.text = arg.text, this.message_side = arg.message_side, this.image=arg.image, this.mid=arg.mid;
+        this.text = arg.text, this.user = arg.user, this.image=arg.image, this.mid=arg.mid;
         this.message;
         var $message;
         var filename = "";
+        var message_side = ROOMNAME === this.user ? 'left':'right';
+
         $message = $($('.message_template').clone(true).html());
-        $message.addClass(this.message_side);
+        $message.addClass(message_side);
         $message.attr("id",this.mid);
+        $message.attr("data-uid",this.user);
         
         if(this.text!=null){
             $message.find('.text').html( this.text);
@@ -279,20 +277,9 @@
         
         if(this.image!=null){
             
-            let scaledImg = new Image();
-            let imageLink = document.createElement("a");
-            
-            imageLink.setAttribute("href", this.image);
-            imageLink.setAttribute('download', `${this.mid}.webp`);
-
-            scaledImg.onload = function () {
-                imageLink.appendChild(scaledImg);
-                $message.find(".m_imagediv").prepend(imageLink);
-            };
-            
+            let scaledImg = document.createElement("img");
             scaledImg.setAttribute("src", this.image);
-            
-            $message.prepend(imageLink);
+            $message.find(".m_imagediv").prepend(scaledImg);
             
         }
         return $message;
@@ -322,8 +309,6 @@
         return m.replace(regURL,"<a href='$1://$2' target='_blank'>$1://$2</a>").replace(regEmail,"<a href='mailto:$1'>$1</a>");
     }
 
-
-
     $('.delete_photo').click(async function (e) {
         $('form').get(0).reset();
         is_file= false;
@@ -343,7 +328,7 @@
         chatSocket.send(JSON.stringify({
             'command':'delete_message',
             'message': {
-                'room':ROOMNAME,
+                // 'room':ROOMNAME,
                 'mid':mid
             },
         }));
@@ -401,12 +386,18 @@
         remove_preview();
     });
 
+    $('#autoscroll-button').click( async function (e) {
+        autoscroll = !autoscroll;
+        $(this).toggleClass("fa-lock-open");
+        $(this).toggleClass("fa-lock");
+    });
+    
     async function sendChatMessage(mediafile=null){
         var timestamp = + new Date();
         var text = readMessageText();
         
         var message = {
-            'room': ROOMNAME,
+            // 'room': ROOMNAME,
             'user': USER,
             'text': text,
             'media': mediafile,
@@ -420,14 +411,14 @@
         reset_input();
     }
 
-    // $('.message_input').keyup(function (e) {
-    //     autosize.update(ta);
-    //     if (e.which === 13) {
-    //         if (!event.shiftKey){
-    //             $('.send-message-button').click();
-    //         }
-    //     }
-    // });
+    $('.message_input').keyup(function (e) {
+        autosize.update(ta);
+        if (e.which === 13) {
+            if (!e.shiftKey){
+                $('.send-message-button').click();
+            }
+        }
+    });
 
     function remove_preview(){
         $(".previewdiv img").remove();
@@ -503,15 +494,6 @@
     });
     
     var btn = $('#t-button');
-    // $('.messages').scroll(function() {
-    //     if ($('.messages').scrollTop() < 100) {
-    //         btn.addClass('show');
-    //     } else {
-    //         btn.removeClass('show');
-    //     }
-    // });
-    
-    // $messages.animate({scrollTop: $messages.prop('scrollHeight')*2});
     btn.on('click', function(e) {
         e.preventDefault();
         mid = $('.messages li:nth-child(1)').attr('id')
@@ -527,5 +509,165 @@
     $("#accept").click(function(){
         $("#popup").addClass('close');
     });
+    
 
+    function clickInsideElement( e, className ) {
+        var el = e.srcElement || e.target;
+
+        if ( el.classList.contains(className) ) {
+            return el;
+        } else {
+            while ( el = el.parentNode ) {
+            if ( el.classList && el.classList.contains(className) ) {
+                return el;
+            }
+            }
+        }
+
+        return false;
+    }
+    function getPosition(e) {
+        var posx = 0;
+        var posy = 0;
+
+        if (!e) var e = window.event;
+        
+        if (e.pageX || e.pageY) {
+        posx = e.pageX;
+        posy = e.pageY;
+        } else if (e.clientX || e.clientY) {
+        posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+        posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+        }
+
+        return {
+        x: posx,
+        y: posy
+        }
+    }
+
+    var contextMenuClassName = "context-menu";
+    var contextMenuItemClassName = "option";
+    var contextMenuLinkClassName = "option-link";
+    var contextMenuActive = "context-menu--active";
+
+    var taskItemClassName = "text_wrapper";
+    var taskItemInContext;
+
+    var clickCoords;
+    var clickCoordsX;
+    var clickCoordsY;
+
+    var menu = document.querySelector("#context-menu");
+    var menuItems = menu.querySelectorAll(".option");
+    var menuState = 0;
+    var menuWidth;
+    var menuHeight;
+    var menuPosition;
+    var menuPositionX;
+    var menuPositionY;
+
+    var windowWidth;
+    var windowHeight;
+    var selectedItem;
+
+    document.addEventListener("contextmenu", function(e) {
+        selectedItem = e.target.closest('.message');
+        // console.log(selectedItem);
+        taskItemInContext = clickInsideElement( e, taskItemClassName );
+
+        if ( taskItemInContext ) {
+            e.preventDefault();
+            toggleMenuOn();
+            positionMenu(e);
+        } else {
+            taskItemInContext = null;
+            toggleMenuOff();
+        }
+    });
+
+    document.addEventListener( "click", function(e) {
+        var clickeElIsLink = clickInsideElement( e, contextMenuLinkClassName );
+
+        if ( clickeElIsLink ) {
+            e.preventDefault();
+            if (selectedItem){
+                
+                menuItemListener(clickeElIsLink, selectedItem);
+            }
+            selectedItem = null;
+        } else {
+            var button = e.which || e.button;
+            if ( button === 1 ) {
+                toggleMenuOff();
+            }
+        }
+    });
+    window.onkeyup = function(e) {
+        if ( e.keyCode === 27 ) {
+            toggleMenuOff();
+        }
+    }
+    window.onresize = function(e) {
+        toggleMenuOff();
+    };
+
+    function toggleMenuOn() {
+        if ( menuState !== 1 ) {
+            menuState = 1;
+            menu.classList.add( contextMenuActive );
+        }
+        }
+
+    function toggleMenuOff() {
+        if ( menuState !== 0 ) {
+            menuState = 0;
+            menu.classList.remove( contextMenuActive );
+        }
+    }
+
+    function positionMenu(e) {
+        clickCoords = getPosition(e);
+        clickCoordsX = clickCoords.x;
+        clickCoordsY = clickCoords.y;
+
+        menuWidth = menu.offsetWidth + 4;
+        menuHeight = menu.offsetHeight + 4;
+
+        windowWidth = window.innerWidth;
+        windowHeight = window.innerHeight;
+
+        if ( (windowWidth - clickCoordsX) < menuWidth ) {
+            menu.style.left = windowWidth - menuWidth + "px";
+        } else {
+            menu.style.left = clickCoordsX + "px";
+        }
+
+        if ( (windowHeight - clickCoordsY) < menuHeight ) {
+            menu.style.top = windowHeight - menuHeight + "px";
+        } else {
+            menu.style.top = clickCoordsY + "px";
+        }
+    }
+
+    function menuItemListener(link,selected) {
+        // console.log(selected);
+        var action = link.getAttribute("data-action");
+        if (action=="blockUser"){
+            chatSocket.send(JSON.stringify({
+                'command':action,
+                'message': {
+                    'user':selected.getAttribute("data-uid"),
+                },
+            }));
+        } else if (action=="addMoment") {
+            chatSocket.send(JSON.stringify({
+                'command':action,
+                'message': {
+                    'mid':selected.getAttribute("id")
+                },
+            }));
+        }
+        toggleMenuOff();
+    }
 </script>

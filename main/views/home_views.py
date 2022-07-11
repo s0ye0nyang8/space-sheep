@@ -1,45 +1,68 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.shortcuts import render
+from django.contrib import messages
 from django.utils.safestring import mark_safe
 import json
 from ..cache import *
-from ..dynamodbauth import updateUserInfo
-
+from ..dynamodbauth import updateUserInfo, updateRoomInfo, removeUser, myauthenticate, getRoominfo
+from ..dynamodbchat import uploadImageS3
 
 def home(request):
     if request.method == 'GET':
-        user_id = request.session.get('user') #세션으로부터 유저 정보 가져오기
-        if user_id is None:
-            return redirect('login')
-        else:
-            # 캐시 유저 정보 안사라진다고 가정
-            user = CacheUser(user_id)
-            room = user.getCachedRoom()
-            nickname = user.getCachedName()
-            if room is None:
-                try:
-                    del request.session['user']
-                except KeyError:
-                    pass
-                return redirect('login')
-            else:
-                return render(request, 'main/home.html',{"nickname":nickname,"room_name":room})
+        uinfo = request.session.get('uinfo') #세션으로부터 유저 정보 가져오기
+        rinfo = None
+        if uinfo is not None:
+            rinfo = getRoominfo(uinfo['room'])
+        return render(request, 'main/home.html',{"user": uinfo,"rinfo":rinfo,"popup":None})
+
+    if request.method == 'POST':
+        pass
+
+def deregister(request):
+    try:
+        email = request.POST['email']
+        password = request.POST['password']
+        uinfo = request.session['uinfo']
+
+        room = uinfo['room']
+        res = myauthenticate(request,email,password)
+        if res is not None:
+            removeUser(request,email=email,room=room,password=password)
+            messages.success(request,'계정이 삭제되었습니다.')
+            del request.session['uinfo']
+            
+        return redirect('home')
+
+    except:
+        messages.error(request, '인증에 실패했습니다.')
+        return redirect('home')
+
+def setting(request):
     
     if request.method == 'POST':
-        user_id = request.session.get('user')
-        user = CacheUser(user_id)
+        uinfo = request.session.get('uinfo')
+        rinfo = getRoominfo(uinfo['room'])
+        blocklist = []
+
+        if 'blocklist' in rinfo.keys():
+            blocklist = rinfo['blocklist']
+
+        try:
+            rinfo = {
+                'rname' : request.POST.get('rname'),
+                'islocked' : request.POST.get('memberonly'),
+                'blocklist': blocklist,
+            }
+            res = updateRoomInfo(roomid=uinfo['room'], rinfo=rinfo)
+        except:
+            raise Http404("권한이 없습니다.")
+
+        try:
+            bg = request.FILES.get('bg-file')
+            if bg is not None:
+                res = uploadImageS3(bg,uinfo['room'])
+        except:
+            raise Http404("User does not exist")
         
-        room = user.getCachedRoom()
-        nickname = request.POST.get('nickname')
-        
-        if nickname is not None:
-            # cache update (room/user)
-            # update userinfo
-            updateUserInfo(request,user_id,nickname,None)
-            CacheUser(email=user_id,name=nickname,room=room).cacheUser()
-
-        return render(request, 'main/home.html',{"nickname":nickname,"room_name":room})
-
-
-    
-    
+        messages.error(request, '설정이 변경되었습니다.')
+           
+        return redirect('home') #/home/ask/{room_name}

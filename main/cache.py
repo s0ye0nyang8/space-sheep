@@ -75,14 +75,9 @@ class CacheMessage:
     def getContent(self):
         return self.content
 
-async def getCachedLatestKey(room):
+def getCachedLatestKey(room):
     key = cache.get('%s:latest'%room)
-    # if key is None:
-    #     newkey = await cachingDBdata(room)
-    #     if newkey is not None:
-    #         cacheLatestKey(room,newkey)
     return key
-    # return cache.get('%s:latest'%room)
 
 def setLatestKey(room, mid):
     cache.set('%s:latest'%room, mid, timeout=None)
@@ -106,40 +101,40 @@ async def cachingDBdata(items,room):
     # return latest among newdata
     return prev
 
-async def get_cached_data(room,resource=None,startkey=None):
+def get_cached_data(room,resource=None,startkey=None):
     messages = []
-    key = startkey
     # cache empty
-    if key is None:
-        # caching data
-        key = await cacheNewDBMessage(room)
-        # key == latestkey
-        setLatestKey(room=room,mid=key)
-        if key is None:
-            return []
+    # key = startkey
+    # if startkey is None:
+    #     # caching data
+    #     key = await cacheNewDBMessage(room)
+    #     # key == latestkey
+    #     setLatestKey(room=room,mid=startkey)
+    #     if key is None:
+    #         return []
     
     # at least 1 cache data
-    cnt = 15
-    message = CacheMessage(key).getMessage()
-    while cnt>0 and message['content'] is not None :
-        messages.append(message['content'])
-
-        if message['next'] is None:
-            # check if this is 'real end'
-            ExclusiveStartKey = {
-                'owner': message['content']['content']['owner'],
-                'timestamp':message['content']['content']['timestamp'],
-            }
-            nextkey = await cacheNewDBMessage(room,ExclusiveStartKey)
-            # connect to previous cache
-            if nextkey is None: # real end
-                return messages
-            CacheMessage(key,nextkey=nextkey,content=message['content']).cacheMessage()
-            message = CacheMessage(nextkey).getMessage()
-        else:
+    cnt = 8
+    if startkey:
+        key = startkey
+        message = CacheMessage(key).getMessage()
+        while cnt>0 and message['content'] is not None :
+            messages.append(message['content'])
+            # if message['next'] is None:
+            #     # check if this is 'real end'
+            #     ExclusiveStartKey = {
+            #         'owner': message['content']['content']['owner'],
+            #         'timestamp':message['content']['content']['timestamp'],
+            #     }
+            #     nextkey = await cacheNewDBMessage(room,ExclusiveStartKey)
+            #     # connect to previous cache
+            #     if nextkey is None: # real end
+            #         return messages
+            #     CacheMessage(key,nextkey=nextkey,content=message['content']).cacheMessage()
+            #     message = CacheMessage(nextkey).getMessage()
+            # else:
             message = CacheMessage(message['next']).getMessage()
-
-        cnt -=1
+            cnt -=1
 
     return messages
 
