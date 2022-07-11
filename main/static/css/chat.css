@@ -26,13 +26,14 @@ body.dimmed::before{
 .popup{
   z-index: 1;
   /* font-family: 'KyoboHand'; */
-  background-color:white;
+  background-color:transparent;
   padding-top: 20px;
   text-align: center;
   position: absolute;
   border: #333;
   top: 50%;
   left: 50%;
+  min-height: 500px;
   transform: translate(-50%,-50%);
   min-width: 300px;
   max-width: 600px;
@@ -51,25 +52,24 @@ body.dimmed::before{
 
 .popup > .cmd {
   bottom: 0;
-  min-height: 50px;
+  min-height: 20px;
   padding: 15px 15px;
   box-sizing: border-box;
   border-radius: 0 0 15px 15px;
-  min-height: 40px;
   text-align: center;
 }
-.popup > .cmd .close-btn {
-  border-radius: 8px;
+
+.cmd .close-btn {
+  border:0;
+  outline: 0;
+  height: 20;
   width:fit-content;
   padding: 5px 10px;
-  background-color: transparent;
-  border: 1px solid black;
+  background-color: white;
   color:black;
 }
-.popup > .cmd .close-btn:hover {
-  color: #fff;
-  background-color: #000;
-  border-color: #000;
+.cmd .close-btn:hover {
+  color:#7DFF68;
 }
 
 .chat_window {
@@ -191,9 +191,6 @@ body.dimmed::before{
   border: medium none;
   display:inline-block;
   vertical-align: middle;
-  
-  /* float:right; */
-
 }
 .messages .message.right button{
   background: rgba(0, 0, 0, 0) none repeat scroll 0 0;

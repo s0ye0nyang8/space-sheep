@@ -16,21 +16,25 @@
         
     </head>
       <body width="100%" height="100%">
-        <!-- <dialog id="notice" >
+        <div class="popup" id='popup' name="notice" >
             <article>
-              <h3>Confirm your action!</h3>
+              <h3>서버비 후원 공지</h3>
               <p>
-                Mauris non nibh vel nisi sollicitudin malesuada. 
-                Donec ut sagittis erat. Praesent eu eros felis. 
-                Ut consectetur placerat pulvinar.
+                안녕하세요! 세븐틴 팬들의 의견으로 장난반 진심반으로 만들어진 스페이스쉽이 어느덧 가입자 3000명이 되었습니다!</br>
+                개인적으로 기쁜 일이고, 캐럿 뿐만 아니라 다른 트위터 유저분들이 사용하시는 걸 보면서 보람도 많이 느꼈습니다. ^^</br>
+                그러나 서버비가 30만원대로 꾸준히 증가하고 있는 추세여서, 임시로 후원을 받지 않으면 운영이 어렵게 되었습니다 ㅜㅠ</br>
+                서비스를 잘 사용하고 계시다면 (특히나 기업 마케팅이나 개인적 이윤 목적으로 사용하고 계신다면) 꼭 후원 부탁드립니다. </br>
+                몇 달 전에 모금된 금액의 사용 내역은 트위터 계정에 게시해둘 예정입니다.</br>
               </p>
+              <p><strong>카뱅 3333-19-0078153 ㅇㅅㅇ</strong></p>
+              <p>감사합니다</p>
               <footer>
                 <div class="cmd">
-                    <a role="button" id="accept" class="close-btn" onClick="toggleModal(event);PopupNoDisplay();" data-target="notice">오늘 하루 보지 않기</a>
+                    <a id="accept" class="close-btn" onClick="PopupNoDisplay();" data-target="popup">오늘 하루 보지 않기</a>
                 </div>
               </footer>
             </article>
-        </dialog> -->
+        </div>
         <div class="chat_window" id="mybackground">
             <i id="t-button" class="fa-solid fa-angles-up"></i>
             <i id="autoscroll-button" class="fa-solid fa-lock-open"></i>
@@ -131,12 +135,12 @@
         PopupHide(); 
     }
 
-    function PopupBgDisplay() { 
-        cookiedata1 = document.cookie; 
-        if (cookiedata1.indexOf("popup=done") > 0) { 
-            $('.overlay').toggleClass('open');
-        }
-    }
+    // function PopupBgDisplay() { 
+    //     cookiedata1 = document.cookie; 
+    //     if (cookiedata1.indexOf("popup=done") > 0) { 
+    //         $('.overlay').toggleClass('open');
+    //     }
+    // }
     function PopupHide() { //팝업창 지우기 
         $('#popup').hide(); 
         PopupBgDisplay();
@@ -146,10 +150,13 @@
         cookiedata = document.cookie; 
         if ( cookiedata.indexOf("popup=done") < 0 ){ //쿠키 변경 여부 불러오기 
             document.all['popup'].style.visibility = "visible"; 
+            console.log("visible");
         } else { 
             document.all['popup'].style.display = "none"; 
+            console.log("unvisible");
+
         } 
-        PopupBgDisplay(); 
+        // PopupBgDisplay(); 
     });
 
     chatSocket.onopen = function(e) {
